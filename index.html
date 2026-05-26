@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ETIKETKA GP | ULTRA TACTILE</title>
+    <title>ETIKETKA GP | X-RAY VISION</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -18,13 +18,19 @@
         * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; }
         
         body { 
-            background: #050505; 
+            background: #000; 
             color: #fff; 
             font-family: 'Space Grotesk', sans-serif;
             overflow-x: hidden;
         }
 
-        canvas { position: fixed; top: 0; left: 0; z-index: 0; pointer-events: none; }
+        /* 3D Background */
+        canvas { 
+            position: fixed; 
+            top: 0; left: 0; 
+            z-index: 1; /* Об'єкт ПІД текстом */
+            pointer-events: none; 
+        }
         
         .cursor {
             position: fixed; width: 10px; height: 10px; background: #fff;
@@ -32,38 +38,53 @@
             mix-blend-mode: difference; transition: transform 0.1s;
         }
 
-        .section {
-            min-height: 100vh; width: 100%; position: relative;
-            display: flex; align-items: center; justify-content: center;
-            z-index: 1; padding: 10vw;
+        /* Головний екран */
+        .hero-section {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 10; /* Текст НАД об'єктом */
+        }
+
+        .hero-container {
+            text-align: center;
+            pointer-events: none; /* Щоб ми могли взаємодіяти з 3D крізь текст */
         }
 
         .hero-title {
-            font-size: clamp(3rem, 15vw, 12rem);
+            font-size: clamp(4rem, 18vw, 15rem);
             line-height: 0.8;
             font-weight: 900;
             text-transform: uppercase;
-            letter-spacing: -0.05em;
-            transition: color 0.2s ease;
+            letter-spacing: -0.06em;
+            color: #fff;
+            /* ОСНОВНА МАГІЯ: текст інвертує кольори того, що під ним */
+            mix-blend-mode: difference; 
         }
 
-        .outline { -webkit-text-stroke: 1px rgba(255,255,255,0.2); color: transparent; }
-        
-        /* Bento Cards - Contact Style */
+        .hero-sub {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.8em;
+            margin-top: 2rem;
+            opacity: 0.8;
+            mix-blend-mode: difference;
+        }
+
+        /* Bento Grid Restored */
         .bento-card {
-            background: rgba(255, 255, 255, 0.02);
-            backdrop-filter: blur(30px);
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 32px;
             padding: 40px;
             transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
             display: flex; flex-direction: column; justify-content: space-between;
+            z-index: 20;
         }
-        .bento-card:hover { 
-            background: rgba(255, 255, 255, 0.05);
-            border-color: var(--accent);
-            transform: translateY(-10px);
-        }
+        .bento-card:hover { border-color: var(--accent); transform: translateY(-10px); }
 
         .contact-link-main {
             font-size: clamp(2rem, 5vw, 6rem);
@@ -74,19 +95,10 @@
         }
         .contact-link-main:hover { -webkit-text-stroke: 1px #fff; color: white; }
 
-        .btn-messenger {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 20px; border-radius: 20px;
-            text-align: center; font-size: 11px; font-weight: 900;
-            text-transform: uppercase; letter-spacing: 2px;
-            transition: all 0.3s ease;
-        }
-        .btn-messenger:hover { background: #fff; color: #000; }
-
         .nav {
             position: fixed; top: 0; width: 100%; padding: 2rem;
             display: flex; justify-content: space-between; z-index: 100;
-            mix-blend-difference: difference;
+            mix-blend-mode: difference;
         }
     </style>
 </head>
@@ -96,64 +108,51 @@
     <canvas id="webgl"></canvas>
 
     <nav class="nav">
-        <div class="font-black text-xl tracking-tighter uppercase">GP<span class="text-accent">.</span></div>
-        <div class="text-[10px] uppercase tracking-[0.4em] font-bold opacity-40">Kyiv / 2026</div>
+        <div class="font-black text-xl tracking-tighter">GP<span class="text-accent">.</span></div>
+        <div class="text-[10px] uppercase tracking-[0.4em] font-bold">Kyiv Syndicate</div>
     </nav>
 
     <main>
-        <section class="section">
-            <div class="text-center select-none">
-                <h1 id="text-top" class="hero-title">Etiketka</h1>
-                <h1 id="text-bottom" class="hero-title outline">GP<span class="text-accent">.</span></h1>
-                <p id="hero-sub" class="mt-10 text-[10px] uppercase tracking-[0.8em] font-bold opacity-40">Tactile Engineering</p>
+        <section class="hero-section">
+            <div class="hero-container">
+                <h1 class="hero-title">ETIKETKA</h1>
+                <h1 class="hero-title">GP<span class="text-accent">.</span></h1>
+                <p class="hero-sub">Architects of Tactility</p>
             </div>
         </section>
 
-        <section class="section">
-             <div class="max-w-4xl text-center">
-                 <h2 class="text-5xl font-black uppercase mb-8 opacity-20">Про нас скоро буде...</h2>
+        <section class="min-h-screen flex items-center px-10 relative z-20">
+             <div class="max-w-4xl">
+                 <h2 class="text-6xl font-black uppercase mb-10 leading-none">Більше ніж <br><span class="text-accent">друк.</span></h2>
+                 <p class="text-xl text-white/40 leading-relaxed max-w-2xl">Ми працюємо на межі цифрового дизайну та фізичного матеріалу. Наступний блок буде про наші кейси.</p>
              </div>
         </section>
 
-        <section id="contacts" class="section flex flex-col px-6 py-32">
-            <div class="w-full max-w-6xl">
+        <section id="contacts" class="py-32 px-6 relative z-20">
+            <div class="w-full max-w-6xl mx-auto">
                 <div class="mb-24 text-center">
-                    <span class="text-accent text-[10px] font-black uppercase tracking-[0.6em] block mb-10">Get in touch</span>
                     <a href="mailto:etiketagp@gmail.com" class="contact-link-main uppercase break-all">
                         etiketagp@gmail.com
                     </a>
                 </div>
 
                 <div class="grid grid-cols-12 gap-6">
-                    <a href="tel:0632686842" class="bento-card col-span-12 md:col-span-5 min-h-[320px]">
-                        <span class="text-[10px] uppercase tracking-widest opacity-30">Direct Line</span>
-                        <div class="text-4xl md:text-5xl font-black tracking-tighter mt-auto">063 268 68 42</div>
+                    <a href="tel:0632686842" class="bento-card col-span-12 md:col-span-5 min-h-[300px]">
+                        <span class="text-[10px] uppercase opacity-30 tracking-widest">Call Node</span>
+                        <div class="text-4xl font-black mt-auto">063 268 68 42</div>
                     </a>
-
-                    <div class="bento-card col-span-12 md:col-span-7 min-h-[320px]">
-                        <span class="text-[10px] uppercase tracking-widest opacity-30">Nodes</span>
-                        <div class="grid grid-cols-2 gap-4 mt-auto">
-                            <a href="#" class="btn-messenger">Telegram</a>
-                            <a href="#" class="btn-messenger">Viber</a>
+                    <div class="bento-card col-span-12 md:col-span-7 min-h-[300px]">
+                        <span class="text-[10px] uppercase opacity-30 tracking-widest">Messengers</span>
+                        <div class="flex gap-4 mt-auto">
+                            <a href="#" class="flex-1 py-4 bg-white/5 hover:bg-white hover:text-black rounded-xl text-center text-xs font-bold transition-all">TELEGRAM</a>
+                            <a href="#" class="flex-1 py-4 bg-white/5 hover:bg-white hover:text-black rounded-xl text-center text-xs font-bold transition-all">VIBER</a>
                         </div>
-                        <div class="mt-6 text-[9px] font-mono opacity-20 uppercase tracking-widest">Office: 098 681 20 21</div>
                     </div>
-
-                    <div class="bento-card col-span-12 md:col-span-8 min-h-[250px]">
-                        <span class="text-[10px] uppercase tracking-widest opacity-30">Location</span>
-                        <div class="text-4xl font-black uppercase tracking-tighter mt-auto">Kyiv, Ukraine</div>
+                    <div class="bento-card col-span-12 min-h-[200px]">
+                        <span class="text-[10px] uppercase opacity-30 tracking-widest">HQ Location</span>
+                        <div class="text-3xl font-black mt-auto">KYIV, UKRAINE</div>
                     </div>
-
-                    <a href="#" class="bento-card col-span-12 md:col-span-4 min-h-[250px] group">
-                        <span class="text-[10px] uppercase tracking-widest opacity-30">Social</span>
-                        <div class="text-2xl font-black mt-auto group-hover:text-accent transition-colors">INSTAGRAM ↗</div>
-                    </a>
                 </div>
-
-                <footer class="mt-40 pt-10 border-t border-white/5 flex justify-between items-center opacity-30">
-                    <div class="text-[9px] uppercase tracking-[0.5em]">© 2026 ETIKETKA GP</div>
-                    <div class="text-[9px] uppercase tracking-[0.5em]">Engineered in Kyiv</div>
-                </footer>
             </div>
         </section>
     </main>
@@ -167,15 +166,12 @@
         void main() {
             vNormal = normal;
             vec3 pos = position;
-            
-            // Твоя деформація
-            float noise = sin(pos.x * 2.0 + uTime) * cos(pos.y * 2.0 + uTime) * 0.2;
+            float noise = sin(pos.x * 2.0 + uTime) * cos(pos.y * 2.0 + uTime) * 0.25;
             pos += normal * noise;
             
-            // Твій магніт до миші
             float dist = distance(uMouse, pos.xy * 0.2);
-            if(dist < 1.0) {
-                pos += normal * (1.0 - dist) * 0.5;
+            if(dist < 1.2) {
+                pos += normal * (1.2 - dist) * 0.6;
             }
 
             vPosition = pos;
@@ -187,95 +183,61 @@
         varying vec3 vNormal;
         varying vec3 vPosition;
         uniform float uTime;
-        uniform vec3 uColor; // Додав uniform для керування кольором
 
         void main() {
             vec3 viewDirection = normalize(vec3(0, 0, 5) - vPosition);
             float fresnel = pow(1.0 - dot(viewDirection, vNormal), 3.0);
             
-            // Твій мікс кольорів
-            vec3 color = mix(vec3(0.02), uColor, fresnel);
+            // Насичений помаранчевий
+            vec3 color = mix(vec3(0.01), vec3(1.0, 0.2, 0.0), fresnel);
             gl_FragColor = vec4(color, 1.0);
         }
     </script>
 
     <script>
-        // 1. Плавний скрол
+        // 1. Lenis Smooth Scroll
         const lenis = new Lenis();
         function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
         requestAnimationFrame(raf);
 
-        // 2. Three.js Engine
+        // 2. Three.js
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ canvas: document.querySelector('#webgl'), antialias: true, alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-        const uniforms = {
-            uTime: { value: 0 },
-            uMouse: { value: new THREE.Vector2(0, 0) },
-            uColor: { value: new THREE.Color("#FF3300") } // Стартовий помаранчевий
-        };
-
-        const geometry = new THREE.IcosahedronGeometry(2.1, 64);
+        const geometry = new THREE.IcosahedronGeometry(2.3, 64);
         const material = new THREE.ShaderMaterial({
             vertexShader: document.getElementById('vertexShader').textContent,
             fragmentShader: document.getElementById('fragmentShader').textContent,
-            uniforms: uniforms
+            uniforms: {
+                uTime: { value: 0 },
+                uMouse: { value: new THREE.Vector2(0, 0) }
+            }
         });
 
         const mesh = new THREE.Mesh(geometry, material);
         scene.add(mesh);
         camera.position.z = 5;
 
-        // 3. Динамічна інверсія кольору тексту
-        const textTop = document.getElementById('text-top');
-        const textBottom = document.getElementById('text-bottom');
-        const heroSub = document.getElementById('hero-sub');
-
-        function updateContrast() {
-            const time = performance.now() * 0.001;
-            
-            // Пульсація яскравості об'єкта (від темно-помаранчевого до яскравого білого)
-            const cycle = Math.sin(time * 0.8) * 0.5 + 0.5;
-            const baseColor = new THREE.Color("#FF3300");
-            const whiteColor = new THREE.Color("#ffffff");
-            
-            // Міксуємо колір
-            uniforms.uColor.value.copy(baseColor).lerp(whiteColor, cycle);
-
-            // Розрахунок яскравості для інверсії тексту
-            const luminance = (0.299 * uniforms.uColor.value.r + 0.587 * uniforms.uColor.value.g + 0.114 * uniforms.uColor.value.b);
-            
-            // Якщо об'єкт стає дуже світлим (cycle > 0.7), текст стає темним
-            const isLight = cycle > 0.6;
-            const textColor = isLight ? "#050505" : "#ffffff";
-            
-            textTop.style.color = textColor;
-            textBottom.style.color = isLight ? "#050505" : "transparent";
-            heroSub.style.color = textColor;
-        }
-
-        // Mouse Move
+        // Mouse Tracker
         window.addEventListener('mousemove', (e) => {
-            const mouseX = (e.clientX / window.innerWidth) * 2 - 1;
-            const mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
-            gsap.to(uniforms.uMouse.value, { x: mouseX * 2, y: mouseY * 2, duration: 0.5 });
+            const mx = (e.clientX / window.innerWidth) * 2 - 1;
+            const my = -(e.clientY / window.innerHeight) * 2 + 1;
+            gsap.to(material.uniforms.uMouse.value, { x: mx * 2, y: my * 2, duration: 0.5 });
             gsap.to('#cursor', { x: e.clientX, y: e.clientY, duration: 0.1 });
         });
 
-        // 4. Animation Loop
+        // 3. Loop
         const clock = new THREE.Clock();
         function animate() {
             const elapsedTime = clock.getElapsedTime();
-            uniforms.uTime.value = elapsedTime;
+            material.uniforms.uTime.value = elapsedTime;
             
-            updateContrast();
-
             mesh.rotation.y = elapsedTime * 0.2;
             
-            // Твій паралакс при скролі
+            // Паралакс
             const scrollY = window.scrollY;
             mesh.position.y = -scrollY * 0.005;
             mesh.rotation.z = scrollY * 0.001;
