@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ETIKETKA GP | REPAIRED ENGINE</title>
+    <title>ETIKETKA GP | TACTILE SYNDICATE</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.19/bundled/lenis.min.js"></script>
 
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;900&display=swap" rel="stylesheet">
@@ -18,57 +19,49 @@
         
         body { background: #000; color: #fff; font-family: 'Space Grotesk', sans-serif; overflow-x: hidden; }
 
-        /* Сцена WebGL (Найнижчий шар) */
+        /* background layers */
         #webgl { position: fixed; top: 0; left: 0; z-index: 1; pointer-events: none; }
         
-        /* ШАР ХМАР (Середній шар) */
         .cloud-container {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 2; pointer-events: none; overflow: hidden;
-            filter: blur(80px); /* Сильний блюр для м'якості */
+            z-index: 2; pointer-events: none; filter: blur(100px);
         }
-
-        .blob {
-            position: absolute; border-radius: 50%; opacity: 0.6;
-            will-change: transform;
-        }
-        .blob-1 { width: 40vw; height: 40vw; background: var(--accent); top: 20%; left: 10%; }
-        .blob-2 { width: 35vw; height: 35vw; background: #fff; top: 40%; left: 50%; opacity: 0.3; }
-        .blob-3 { width: 50vw; height: 50vw; background: #3300ff; bottom: -10%; right: 10%; opacity: 0.2; }
-
-        /* ШАР ТЕКСТУ (Верхній шар) */
-        .hero {
-            position: relative; height: 100vh; width: 100%;
-            display: flex; align-items: center; justify-content: center;
-            z-index: 3; /* НАД хмарами і ПІД курсором */
-        }
-
-        .hero-title {
-            font-size: clamp(4rem, 16vw, 14rem);
-            line-height: 0.8; font-weight: 900; text-transform: uppercase;
-            letter-spacing: -0.06em; text-align: center;
-            color: white;
-            mix-blend-mode: difference; /* ГОЛОВНА МАГІЯ ТУТ */
-            pointer-events: none;
-        }
+        .blob { position: absolute; border-radius: 50%; opacity: 0.4; will-change: transform; }
+        .blob-1 { width: 45vw; height: 45vw; background: var(--accent); top: 10%; left: -10%; }
+        .blob-2 { width: 30vw; height: 30vw; background: #fff; top: 50%; right: 5%; opacity: 0.2; }
 
         .cursor {
-            position: fixed; width: 12px; height: 12px; background: #fff;
+            position: fixed; width: 10px; height: 10px; background: #fff;
             border-radius: 50%; pointer-events: none; z-index: 9999;
             mix-blend-mode: difference;
         }
 
-        /* Bento Grid Restored */
-        .bento-section { position: relative; z-index: 10; padding: 100px 20px; background: #000; }
+        /* Typography */
+        .hero-title {
+            font-size: clamp(4rem, 16vw, 14rem);
+            line-height: 0.8; font-weight: 900; text-transform: uppercase;
+            letter-spacing: -0.06em; text-align: center;
+            color: white; mix-blend-mode: difference;
+        }
+
+        .section-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.6em; color: var(--accent); font-weight: 900; }
+
+        /* Bento Grid */
         .bento-card {
             background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 30px; padding: 40px; min-height: 300px;
-            display: flex; flex-direction: column; justify-content: space-between;
-            transition: 0.4s ease;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 32px; padding: 40px;
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
         }
-        .bento-card:hover { border-color: var(--accent); transform: translateY(-10px); }
+        .bento-card:hover { border-color: var(--accent); transform: translateY(-10px); background: rgba(255, 255, 255, 0.05); }
+
+        .case-card {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 60px 0;
+            transition: all 0.4s ease;
+        }
+        .case-card:hover { border-bottom-color: var(--accent); padding-left: 20px; }
 
         .nav {
             position: fixed; top: 0; width: 100%; padding: 2rem;
@@ -85,44 +78,122 @@
     <div class="cloud-container">
         <div class="blob blob-1" id="blob1"></div>
         <div class="blob blob-2" id="blob2"></div>
-        <div class="blob blob-3" id="blob3"></div>
     </div>
 
     <nav class="nav">
         <div class="font-black text-xl tracking-tighter uppercase">GP<span class="text-accent">.</span></div>
-        <div class="text-[10px] uppercase tracking-[0.4em] font-bold opacity-50">Kyiv Syndicate</div>
+        <div class="text-[10px] uppercase tracking-[0.4em] font-bold">Kyiv / Engineering Studio</div>
     </nav>
 
-    <main>
-        <section class="hero">
-            <h1 class="hero-title">ETIKETKA<br>GP<span class="text-accent">.</span></h1>
+    <main class="relative z-10">
+        <section class="h-screen flex items-center justify-center">
+            <h1 class="hero-title reveal">ETIKETKA<br>GP<span class="text-accent">.</span></h1>
         </section>
 
-        <section class="bento-section">
-            <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-6">
-                <div class="md:col-span-12 mb-10 text-center">
-                    <a href="mailto:etiketagp@gmail.com" class="text-5xl md:text-8xl font-black uppercase tracking-tighter hover:text-accent transition-colors">
-                        etiketagp@gmail.com
-                    </a>
-                </div>
-                
-                <a href="tel:0632686842" class="bento-card md:col-span-5">
-                    <span class="text-[10px] uppercase tracking-widest opacity-30">Primary Line</span>
-                    <div class="text-4xl font-black">063 268 68 42</div>
-                </a>
+        <section class="px-6 py-32 max-w-6xl mx-auto">
+            <span class="section-label mb-10 block">/ Про нас</span>
+            <h2 class="text-4xl md:text-6xl font-black uppercase leading-none mb-12 reveal">
+                Ваш партнер у створенні <br><span class="text-white/20">високоякісної упаковки.</span>
+            </h2>
+            <p class="text-xl md:text-2xl text-white/50 max-w-3xl leading-relaxed reveal">
+                Ми спеціалізуємося на друкуванні індивідуальних етикеток, картонної упаковки та поліграфії для різних галузей. Забезпечуємо потрібний результат у потрібні терміни.
+            </p>
+        </section>
 
-                <div class="bento-card md:col-span-7">
-                    <span class="text-[10px] uppercase tracking-widest opacity-30">Nodes</span>
-                    <div class="flex gap-4 mt-10">
-                        <a href="#" class="flex-1 py-5 bg-white/5 rounded-2xl text-center font-bold hover:bg-white hover:text-black transition-all">TELEGRAM</a>
-                        <a href="#" class="flex-1 py-5 bg-white/5 rounded-2xl text-center font-bold hover:bg-white hover:text-black transition-all">VIBER</a>
+        <section class="px-6 py-20 max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+                <div class="bento-card md:col-span-8 reveal">
+                    <span class="section-label">Асортимент</span>
+                    <div class="mt-10 grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="text-2xl font-bold mb-4 uppercase">Етикетки</h3>
+                            <p class="text-white/40">Самоклеючі етикетки та наклейки будь-якої складності.</p>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold mb-4 uppercase">Упаковка</h3>
+                            <p class="text-white/40">Коробки самозбірні та коробочки з картону.</p>
+                        </div>
+                        <div class="md:col-span-2">
+                            <h3 class="text-2xl font-bold mb-4 uppercase">Поліграфія</h3>
+                            <p class="text-white/40">Флаєри, буклети, листівки, брошури та інше.</p>
+                        </div>
                     </div>
                 </div>
 
-                <div class="bento-card md:col-span-12">
-                    <span class="text-[10px] uppercase tracking-widest opacity-30">Location</span>
-                    <div class="text-4xl font-black mt-4 uppercase">Kyiv, Ukraine / Global HQ</div>
+                <div class="bento-card md:col-span-4 reveal">
+                    <span class="section-label">Дизайн</span>
+                    <div class="mt-10">
+                        <div class="mb-6">
+                            <div class="text-3xl font-black text-accent uppercase">Free</div>
+                            <p class="text-sm opacity-40">Адаптація Вашого макета</p>
+                        </div>
+                        <div class="mb-6">
+                            <div class="text-3xl font-black uppercase">від 100₴</div>
+                            <p class="text-sm opacity-40">Послуги дизайну</p>
+                        </div>
+                        <p class="text-xs font-mono opacity-20 uppercase tracking-widest">Кольоропроба перед друком</p>
+                    </div>
                 </div>
+
+                <div class="bento-card md:col-span-12 flex flex-col md:flex-row justify-between items-center reveal">
+                    <span class="section-label">Логістика</span>
+                    <div class="flex gap-8 mt-6 md:mt-0 grayscale opacity-50">
+                        <span class="font-bold tracking-tighter">НОВА ПОШТА</span>
+                        <span class="font-bold tracking-tighter">УКРПОШТА</span>
+                        <span class="font-bold tracking-tighter">MEEST</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="px-6 py-40 max-w-6xl mx-auto">
+            <span class="section-label mb-20 block">/ Кейси</span>
+            
+            <div class="case-card reveal">
+                <span class="text-xs font-mono opacity-30">01 / Функціональність</span>
+                <h3 class="text-3xl md:text-5xl font-black uppercase mt-4 mb-6">Упаковка, що продає сама</h3>
+                <p class="text-white/40 max-w-2xl text-lg">Розробка етикеток із тактильним покриттям (soft-touch, лак) та елементами гейміфікації (QR-код із таємним посланням).</p>
+            </div>
+
+            <div class="case-card reveal">
+                <span class="text-xs font-mono opacity-30">02 / Швидкість</span>
+                <h3 class="text-3xl md:text-5xl font-black uppercase mt-4 mb-6">Терміновий мерч за 24г</h3>
+                <p class="text-white/40 max-w-2xl text-lg">Експрес-друк наліпок на прозорій плівці для швидкого брендування склянок, одягу та інтер'єру.</p>
+            </div>
+
+            <div class="case-card reveal">
+                <span class="text-xs font-mono opacity-30">03 / Свідомість</span>
+                <h3 class="text-3xl md:text-5xl font-black uppercase mt-4 mb-6">Екологічний мінімалізм</h3>
+                <p class="text-white/40 max-w-2xl text-lg">Виготовлення бірок із крафтового паперу та еко-наліпок із перероблюваним клейовим шаром.</p>
+            </div>
+        </section>
+
+        <section class="px-6 py-40 bg-white text-black rounded-t-[60px]">
+            <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-20">
+                <div>
+                    <span class="text-[10px] font-black uppercase tracking-[0.4em] text-accent block mb-10">Контакти</span>
+                    <a href="mailto:etiketkagp@gmail.com" class="text-3xl md:text-6xl font-black uppercase tracking-tighter hover:text-accent transition-colors block mb-10 break-all">
+                        etiketkagp@gmail.com
+                    </a>
+                    <div class="flex flex-col gap-4 text-2xl font-bold">
+                        <a href="tel:0632686842">063 268 68 42 (Дзвінки)</a>
+                        <a href="tel:0986812021" class="text-accent">098 681 20 21 (TG/Viber)</a>
+                    </div>
+                </div>
+                
+                <div class="flex flex-col justify-between">
+                    <div>
+                        <p class="text-[10px] font-black uppercase tracking-[0.4em] opacity-40 mb-6">Локація</p>
+                        <p class="text-4xl font-black uppercase leading-tight">м. Київ<br>вул. Промислова 1а</p>
+                    </div>
+                    <div class="mt-20">
+                        <a href="#" class="text-xl font-black border-b-4 border-black pb-2 hover:border-accent transition-all uppercase">Instagram: etiketkagp</a>
+                    </div>
+                </div>
+            </div>
+            <div class="max-w-7xl mx-auto mt-40 pt-10 border-t border-black/10 flex justify-between items-center text-[10px] font-bold opacity-30 uppercase tracking-widest">
+                <span>© 2026 ETIKETKA GP</span>
+                <span>Designed for tactile dominance</span>
             </div>
         </section>
     </main>
@@ -135,10 +206,10 @@
         void main() {
             vNormal = normal;
             vec3 pos = position;
-            float noise = sin(pos.x * 2.0 + uTime) * cos(pos.y * 2.0 + uTime) * 0.2;
+            float noise = sin(pos.x * 2.0 + uTime) * cos(pos.y * 2.0 + uTime) * 0.25;
             pos += normal * noise;
             float dist = distance(uMouse, pos.xy * 0.2);
-            if(dist < 1.0) { pos += normal * (1.0 - dist) * 0.5; }
+            if(dist < 1.2) { pos += normal * (1.2 - dist) * 0.6; }
             vPosition = pos;
             gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
         }
@@ -151,24 +222,24 @@
         void main() {
             vec3 viewDirection = normalize(vec3(0, 0, 5) - vPosition);
             float fresnel = pow(1.0 - dot(viewDirection, vNormal), 3.0);
-            vec3 color = mix(vec3(0.02), vec3(1.0, 0.2, 0.0), fresnel);
+            vec3 color = mix(vec3(0.01), vec3(1.0, 0.2, 0.0), fresnel);
             gl_FragColor = vec4(color, 1.0);
         }
     </script>
 
     <script>
-        // Smooth Scroll
+        // 1. Smooth Scroll
         const lenis = new Lenis();
         function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
         requestAnimationFrame(raf);
 
-        // Three.js (Плюшка)
+        // 2. Three.js
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ canvas: document.querySelector('#webgl'), antialias: true, alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         
-        const geometry = new THREE.IcosahedronGeometry(2.2, 64);
+        const geometry = new THREE.IcosahedronGeometry(2.3, 64);
         const material = new THREE.ShaderMaterial({
             vertexShader: document.getElementById('vertexShader').textContent,
             fragmentShader: document.getElementById('fragmentShader').textContent,
@@ -178,7 +249,7 @@
         scene.add(mesh);
         camera.position.z = 5;
 
-        // Mouse & Cursor
+        // Mouse Tracker
         window.addEventListener('mousemove', (e) => {
             const mx = (e.clientX / window.innerWidth) * 2 - 1;
             const my = -(e.clientY / window.innerHeight) * 2 + 1;
@@ -186,25 +257,33 @@
             gsap.to('#cursor', { x: e.clientX, y: e.clientY, duration: 0.1 });
         });
 
-        // Анімація хмар (Блобів)
+        // 3. Clouds Animation
         function moveBlob(id) {
             gsap.to(id, {
-                x: `random(-15, 15)vw`,
-                y: `random(-15, 15)vh`,
-                duration: `random(10, 20)`,
+                x: `random(-20, 20)vw`,
+                y: `random(-20, 20)vh`,
+                duration: `random(15, 25)`,
                 ease: "sine.inOut",
                 onComplete: () => moveBlob(id)
             });
         }
         moveBlob('#blob1');
         moveBlob('#blob2');
-        moveBlob('#blob3');
+
+        // 4. GSAP Reveal
+        gsap.registerPlugin(ScrollTrigger);
+        gsap.utils.toArray('.reveal').forEach(el => {
+            gsap.from(el, {
+                scrollTrigger: { trigger: el, start: "top 90%" },
+                y: 60, opacity: 0, duration: 1.2, ease: "power3.out"
+            });
+        });
 
         // Loop
         const clock = new THREE.Clock();
         function animate() {
             material.uniforms.uTime.value = clock.getElapsedTime();
-            mesh.rotation.y += 0.005;
+            mesh.rotation.y += 0.003;
             const scrollY = window.scrollY;
             mesh.position.y = -scrollY * 0.005;
             renderer.render(scene, camera);
