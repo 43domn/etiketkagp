@@ -3,219 +3,235 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ETIKETKA GP | HYPER TACTILE</title>
+    <title>ETIKETKA GP | ULTRA TACTILE</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollToPlugin.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.19/bundled/lenis.min.js"></script>
 
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;900&display=swap" rel="stylesheet">
     
     <style>
         :root { --accent: #FF3300; }
         * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; }
+        
         body { 
-            background: #000; 
+            background: #050505; 
             color: #fff; 
             font-family: 'Space Grotesk', sans-serif;
-            overflow: hidden; /* Control scroll via Lenis/GSAP */
+            overflow-x: hidden;
         }
-        canvas { position: fixed; top: 0; left: 0; z-index: 1; pointer-events: none; }
+
+        canvas { position: fixed; top: 0; left: 0; z-index: 0; pointer-events: none; }
         
-        /* Custom Cursor */
         .cursor {
-            position: fixed; width: 20px; height: 20px; background: var(--accent);
+            position: fixed; width: 8px; height: 8px; background: #fff;
             border-radius: 50%; pointer-events: none; z-index: 9999;
-            mix-blend-mode: difference; transition: transform 0.15s ease-out;
+            mix-blend-mode: difference; transition: transform 0.1s;
         }
 
         .section {
-            height: 100vh; width: 100%; position: relative;
+            min-height: 100vh; width: 100%; position: relative;
             display: flex; align-items: center; justify-content: center;
-            padding: 0 10%; z-index: 2;
+            z-index: 1; padding: 10vw;
         }
 
-        .hero-text { font-size: 15vw; line-height: 0.8; font-weight: 900; letter-spacing: -0.05em; }
-        .outline-text { -webkit-text-stroke: 1px rgba(255,255,255,0.2); color: transparent; }
+        .hero-title {
+            font-size: clamp(3rem, 15vw, 12rem);
+            line-height: 0.8;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -0.05em;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 40px;
+            padding: 3rem;
+            transition: border-color 0.5s;
+        }
+        .glass-card:hover { border-color: var(--accent); }
+
+        .outline { -webkit-text-stroke: 1px rgba(255,255,255,0.3); color: transparent; }
         
-        .bento-grid {
-            display: grid; grid-template-columns: repeat(12, 1fr); gap: 20px; width: 100%;
-        }
-        .bento-item {
-            background: rgba(255,255,255,0.03); backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.1); border-radius: 30px;
-            padding: 40px; transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
-        }
-        .bento-item:hover { background: rgba(255,255,255,0.08); border-color: var(--accent); transform: scale(1.02); }
-
-        .nav-fixed {
-            position: fixed; top: 40px; left: 40px; right: 40px;
+        .nav {
+            position: fixed; top: 0; width: 100%; padding: 2rem;
             display: flex; justify-content: space-between; z-index: 100;
+            mix-blend-difference: difference;
         }
     </style>
 </head>
 <body>
 
     <div class="cursor" id="cursor"></div>
-    <canvas id="canvas3d"></canvas>
+    <canvas id="webgl"></canvas>
 
-    <nav class="nav-fixed mix-blend-difference">
-        <div class="text-2xl font-black">GP<span class="text-[var(--accent)]">.</span></div>
-        <div class="flex gap-8 text-[10px] uppercase tracking-widest font-bold">
-            <button onclick="gsap.to(window, {scrollTo: '#sec1'})">Home</button>
-            <button onclick="gsap.to(window, {scrollTo: '#sec2'})">Manifesto</button>
-            <button onclick="gsap.to(window, {scrollTo: '#sec3'})">Cases</button>
-        </div>
+    <nav class="nav">
+        <div class="font-black text-xl tracking-tighter">GP<span class="text-accent">.</span></div>
+        <div class="text-[10px] uppercase tracking-[0.4em] font-bold opacity-50">Kyiv Syndicate</div>
     </nav>
 
-    <main id="main">
-        <section id="sec1" class="section">
+    <main>
+        <section class="section">
             <div class="text-center">
-                <div class="overflow-hidden">
-                    <h1 class="hero-text transform-up">ETIKETKA</h1>
-                </div>
-                <div class="overflow-hidden">
-                    <h1 class="hero-text outline-text transform-up">SYNTHESIS</h1>
-                </div>
-                <p class="mt-8 text-white/40 tracking-[0.5em] uppercase text-xs">Architects of tactile reality / Kyiv 2026</p>
+                <h1 class="hero-title reveal">Digital</h1>
+                <h1 class="hero-title outline reveal">Tactility</h1>
+                <p class="mt-10 text-[10px] uppercase tracking-[0.6em] text-accent font-bold reveal">Скроль вниз для занурення</p>
             </div>
         </section>
 
-        <section id="sec2" class="section">
-            <div class="bento-grid">
-                <div class="bento-item col-span-12 md:col-span-7">
-                    <span class="text-accent text-xs font-bold tracking-widest uppercase">/ 01 Engineering</span>
-                    <h2 class="text-5xl font-bold mt-4 mb-6">Майбутнє, яке можна торкнутися.</h2>
-                    <p class="text-white/50 leading-relaxed max-w-md">Ми не просто друкуємо — ми створюємо фізичні інтерфейси для ваших продуктів. Кожен мікрон лаку має значення.</p>
+        <section class="section">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10 w-full">
+                <div class="glass-card reveal">
+                    <span class="text-accent text-xs font-bold tracking-widest uppercase">/ Engineering</span>
+                    <h2 class="text-4xl font-bold mt-4 mb-6 uppercase">Фізика матеріалів</h2>
+                    <p class="text-white/40 leading-relaxed">Ми перетворюємо цифрові ідеї на тактильний досвід. Наші етикетки — це не папір, це архітектура бренду.</p>
                 </div>
-                <div class="bento-item col-span-12 md:col-span-5 flex items-center justify-center border-accent/20">
-                    <div class="text-center">
-                        <div class="text-6xl font-black mb-2">99.9%</div>
-                        <div class="text-[10px] uppercase tracking-widest text-white/40">Точність кольору</div>
-                    </div>
+                <div class="flex flex-col justify-end reveal">
+                    <h3 class="text-8xl font-black opacity-10">01</h3>
+                    <p class="text-sm border-l-2 border-accent pl-6 py-2">Преміальний сегмент / Складна геометрія / Безкомпромісна якість</p>
                 </div>
             </div>
         </section>
 
-        <section id="sec3" class="section">
-            <div class="w-full">
-                <h2 class="text-8xl font-black outline-text mb-12">PROJECTS</h2>
-                <div class="flex gap-10 overflow-x-hidden">
-                    <div class="min-w-[400px] h-[500px] bento-item bg-cover bg-center relative group" style="background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80')">
-                         <div class="absolute inset-0 bg-black/60 group-hover:bg-accent/40 transition-all duration-500 rounded-[30px]"></div>
-                         <div class="relative z-10 p-4">
-                             <h3 class="text-2xl font-bold">VODKA PREM</h3>
-                             <p class="text-xs opacity-60">Embossing / Foil / Tactile</p>
-                         </div>
+        <section class="section">
+            <div class="glass-card w-full reveal">
+                <h2 class="text-6xl font-black uppercase mb-10">Контакти</h2>
+                <div class="flex flex-wrap gap-20">
+                    <div>
+                        <p class="text-[10px] uppercase opacity-30 mb-2">Локація</p>
+                        <p class="text-xl">Київ, Україна</p>
                     </div>
-                    <div class="min-w-[400px] h-[500px] bento-item bg-cover bg-center relative group" style="background-image: url('https://images.unsplash.com/photo-1594035910387-fea47794261f?q=80')">
-                         <div class="absolute inset-0 bg-black/60 group-hover:bg-accent/40 transition-all duration-500 rounded-[30px]"></div>
-                         <div class="relative z-10 p-4">
-                             <h3 class="text-2xl font-bold">PARFUM NOIR</h3>
-                             <p class="text-xs opacity-60">Soft Touch / UV Varnish</p>
-                         </div>
+                    <div>
+                        <p class="text-[10px] uppercase opacity-30 mb-2">Зв'язок</p>
+                        <p class="text-xl hover:text-accent transition-colors">etiketagp@gmail.com</p>
                     </div>
                 </div>
             </div>
         </section>
     </main>
 
+    <script id="vertexShader" type="x-shader/x-vertex">
+        varying vec3 vNormal;
+        varying vec3 vPosition;
+        uniform float uTime;
+        uniform vec2 uMouse;
+
+        void main() {
+            vNormal = normal;
+            vec3 pos = position;
+            
+            // Деформація шейдером (не лагає!)
+            float noise = sin(pos.x * 2.0 + uTime) * cos(pos.y * 2.0 + uTime) * 0.2;
+            pos += normal * noise;
+            
+            // Магніт до миші
+            float dist = distance(uMouse, pos.xy * 0.2);
+            if(dist < 1.0) {
+                pos += normal * (1.0 - dist) * 0.5;
+            }
+
+            vPosition = pos;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+        }
+    </script>
+
+    <script id="fragmentShader" type="x-shader/x-fragment">
+        varying vec3 vNormal;
+        varying vec3 vPosition;
+        uniform float uTime;
+
+        void main() {
+            // Ефект Френеля (світіння країв)
+            vec3 viewDirection = normalize(vec3(0, 0, 5) - vPosition);
+            float fresnel = pow(1.0 - dot(viewDirection, vNormal), 3.0);
+            
+            vec3 color = mix(vec3(0.02), vec3(1.0, 0.2, 0.0), fresnel);
+            gl_FragColor = vec4(color, 1.0);
+        }
+    </script>
+
     <script>
-        // 1. SCROLL SETUP (LENIS + GSAP)
-        const lenis = new Lenis({ duration: 1.5, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
-        function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
+        // 1. Плавний скрол (Lenis)
+        const lenis = new Lenis();
+        function raf(time) {
+            lenis.raf(time);
+            requestAnimationFrame(raf);
+        }
         requestAnimationFrame(raf);
 
-        // Section Snapping
-        gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
-        const sections = gsap.utils.toArray(".section");
-        sections.forEach((section, i) => {
-            ScrollTrigger.create({
-                trigger: section,
-                start: "top center",
-                onEnter: () => gsap.to(window, {scrollTo: {y: section, autoKill: false}, duration: 1, ease: "power4.inOut"}),
-            });
-        });
-
-        // 2. THREE.JS: MORPHING LIQUID OBJECT
+        // 2. Three.js Engine
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('canvas3d'), alpha: true, antialias: true });
+        const renderer = new THREE.WebGLRenderer({ 
+            canvas: document.querySelector('#webgl'), 
+            antialias: true, 
+            alpha: true 
+        });
         renderer.setSize(window.innerWidth, window.innerHeight);
-        
-        // Geometry
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+        // Geometry & Shader Material
         const geometry = new THREE.IcosahedronGeometry(2, 64);
-        const material = new THREE.MeshNormalMaterial({ wireframe: false, flatShading: false });
-        
-        // Custom Shader for "Liquid" effect
-        const customMaterial = new THREE.MeshStandardMaterial({
-            color: 0x111111,
-            metalness: 1,
-            roughness: 0.05,
-            emissive: 0xFF3300,
-            emissiveIntensity: 0.1
+        const material = new THREE.ShaderMaterial({
+            vertexShader: document.getElementById('vertexShader').textContent,
+            fragmentShader: document.getElementById('fragmentShader').textContent,
+            uniforms: {
+                uTime: { value: 0 },
+                uMouse: { value: new THREE.Vector2(0, 0) }
+            }
         });
 
-        const mesh = new THREE.Mesh(geometry, customMaterial);
+        const mesh = new THREE.Mesh(geometry, material);
         scene.add(mesh);
+        camera.position.z = 5;
 
-        // Lights
-        const light1 = new THREE.DirectionalLight(0xFF3300, 2);
-        light1.position.set(5, 5, 5);
-        scene.add(light1);
-        const light2 = new THREE.PointLight(0x0066FF, 2);
-        light2.position.set(-5, -5, 2);
-        scene.add(light2);
-        scene.add(new THREE.AmbientLight(0x404040));
+        // Mouse tracking
+        let mouse = new THREE.Vector2();
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+            
+            gsap.to(material.uniforms.uMouse.value, { x: mouse.x * 2, y: mouse.y * 2, duration: 0.5 });
+            gsap.to('#cursor', { x: e.clientX, y: e.clientY, duration: 0.1 });
+        });
 
-        camera.position.z = 6;
-
-        // Animation Loop
+        // 3. Анімація
         const clock = new THREE.Clock();
         function animate() {
-            const time = clock.getElapsedTime();
+            const elapsedTime = clock.getElapsedTime();
+            material.uniforms.uTime.value = elapsedTime;
             
-            // Distort Geometry
-            const positions = mesh.geometry.attributes.position;
-            const vertex = new THREE.Vector3();
-            for (let i = 0; i < positions.count; i++) {
-                vertex.fromBufferAttribute(positions, i);
-                const noise = Math.sin(vertex.x * 2 + time) * Math.cos(vertex.y * 2 + time) * 0.2;
-                vertex.multiplyScalar(1 + noise * 0.01);
-                positions.setXYZ(i, vertex.x, vertex.y, vertex.z);
-            }
-            positions.needsUpdate = true;
-
-            mesh.rotation.y += 0.005;
-            mesh.rotation.x += 0.003;
-
-            // Parallax based on scroll
-            const scroll = window.scrollY / 1000;
-            mesh.position.y = Math.sin(scroll) * 0.5;
-            mesh.scale.set(1 + scroll*0.2, 1 + scroll*0.2, 1 + scroll*0.2);
+            mesh.rotation.y = elapsedTime * 0.2;
+            
+            // Паралакс при скролі
+            const scrollY = window.scrollY;
+            mesh.position.y = -scrollY * 0.005;
+            mesh.rotation.z = scrollY * 0.001;
 
             renderer.render(scene, camera);
             requestAnimationFrame(animate);
         }
         animate();
 
-        // 3. CURSOR & INTERACTIVITY
-        const cursor = document.getElementById('cursor');
-        window.addEventListener('mousemove', (e) => {
-            gsap.to(cursor, { x: e.clientX, y: e.clientY, duration: 0.3 });
-            
-            // Interactive 3D move
-            const x = (e.clientX / window.innerWidth - 0.5) * 2;
-            const y = (e.clientY / window.innerHeight - 0.5) * -2;
-            gsap.to(mesh.position, { x: x * 2, y: y * 2, duration: 1 });
-        });
-
-        // 4. GSAP ENTRANCE ANIMATIONS
-        gsap.from(".transform-up", {
-            y: 200, skewY: 10, duration: 1.5, stagger: 0.2, ease: "power4.out"
+        // 4. Reveal Animations (GSAP)
+        gsap.registerPlugin(ScrollTrigger);
+        gsap.utils.toArray('.reveal').forEach(el => {
+            gsap.from(el, {
+                scrollTrigger: {
+                    trigger: el,
+                    start: "top 90%",
+                    toggleActions: "play none none reverse"
+                },
+                y: 50,
+                opacity: 0,
+                duration: 1,
+                ease: "power4.out"
+            });
         });
 
         window.addEventListener('resize', () => {
