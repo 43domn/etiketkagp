@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ETIKETKA GP | ULTRA TACTILE</title>
+    <title>ETIKETKA GP | ULTRA CONTRAST</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -18,7 +18,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; }
         
         body { 
-            background: #050505; 
+            background: #000; 
             color: #fff; 
             font-family: 'Space Grotesk', sans-serif;
             overflow-x: hidden;
@@ -27,37 +27,48 @@
         canvas { position: fixed; top: 0; left: 0; z-index: 0; pointer-events: none; }
         
         .cursor {
-            position: fixed; width: 8px; height: 8px; background: #fff;
+            position: fixed; width: 12px; height: 12px; background: #fff;
             border-radius: 50%; pointer-events: none; z-index: 9999;
-            mix-blend-mode: difference; transition: transform 0.1s;
+            mix-blend-mode: difference; transition: transform 0.1s cubic-bezier(0.17, 0.67, 0.83, 0.67);
         }
 
-        .section {
-            min-height: 100vh; width: 100%; position: relative;
-            display: flex; align-items: center; justify-content: center;
-            z-index: 1; padding: 10vw;
-        }
+        .section { min-height: 100vh; width: 100%; position: relative; display: flex; align-items: center; justify-content: center; z-index: 1; }
 
         .hero-title {
-            font-size: clamp(3rem, 15vw, 12rem);
-            line-height: 0.8;
+            font-size: clamp(3rem, 14vw, 12rem);
+            line-height: 0.75;
             font-weight: 900;
             text-transform: uppercase;
-            letter-spacing: -0.05em;
+            letter-spacing: -0.06em;
+            transition: color 0.1s linear; /* Fast response to match shader */
+            position: relative;
+            z-index: 10;
         }
 
-        .glass-card {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 40px;
-            padding: 3rem;
-            transition: border-color 0.5s;
+        /* Bento Cards - The "Original" Style */
+        .bento-card {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 32px;
+            padding: 40px;
+            transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
         }
-        .glass-card:hover { border-color: var(--accent); }
+        .bento-card:hover { 
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--accent);
+            transform: scale(1.02) translateY(-10px);
+        }
 
-        .outline { -webkit-text-stroke: 1px rgba(255,255,255,0.3); color: transparent; }
-        
+        .contact-link {
+            font-size: clamp(2rem, 6vw, 5rem);
+            font-weight: 900;
+            -webkit-text-stroke: 1px rgba(255,255,255,0.2);
+            color: transparent;
+            transition: all 0.4s ease;
+        }
+        .contact-link:hover { -webkit-text-stroke: 1px #fff; color: white; }
+
         .nav {
             position: fixed; top: 0; width: 100%; padding: 2rem;
             display: flex; justify-content: space-between; z-index: 100;
@@ -72,45 +83,60 @@
 
     <nav class="nav">
         <div class="font-black text-xl tracking-tighter">GP<span class="text-accent">.</span></div>
-        <div class="text-[10px] uppercase tracking-[0.4em] font-bold opacity-50">Kyiv Syndicate</div>
+        <div class="text-[10px] uppercase tracking-[0.4em] font-bold opacity-40">Tactile Engineering / 2026</div>
     </nav>
 
     <main>
-        <section class="section">
-            <div class="text-center">
-                <h1 class="hero-title reveal">Digital</h1>
-                <h1 class="hero-title outline reveal">Tactility</h1>
-                <p class="mt-10 text-[10px] uppercase tracking-[0.6em] text-accent font-bold reveal">Скроль вниз для занурення</p>
+        <section class="section" id="hero">
+            <div class="text-center select-none">
+                <h1 id="dynamic-text-1" class="hero-title">Etiketka</h1>
+                <h1 id="dynamic-text-2" class="hero-title">GP<span class="text-accent">.</span></h1>
+                <p id="dynamic-sub" class="mt-8 text-[10px] uppercase tracking-[0.8em] opacity-40 font-bold transition-colors">Architects of Reality</p>
             </div>
         </section>
 
-        <section class="section">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-10 w-full">
-                <div class="glass-card reveal">
-                    <span class="text-accent text-xs font-bold tracking-widest uppercase">/ Engineering</span>
-                    <h2 class="text-4xl font-bold mt-4 mb-6 uppercase">Фізика матеріалів</h2>
-                    <p class="text-white/40 leading-relaxed">Ми перетворюємо цифрові ідеї на тактильний досвід. Наші етикетки — це не папір, це архітектура бренду.</p>
+        <section class="section px-10">
+            <div class="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 gap-20">
+                <div class="reveal">
+                    <h2 class="text-6xl font-black uppercase mb-8">Маніфест<br>якості.</h2>
                 </div>
-                <div class="flex flex-col justify-end reveal">
-                    <h3 class="text-8xl font-black opacity-10">01</h3>
-                    <p class="text-sm border-l-2 border-accent pl-6 py-2">Преміальний сегмент / Складна геометрія / Безкомпромісна якість</p>
+                <div class="reveal flex items-center">
+                    <p class="text-xl text-white/50 border-l-2 border-accent pl-10">Ми створюємо не просто наклейки, а перший контакт споживача з вашим продуктом. Кожна деталь — це магія фізики та дизайну.</p>
                 </div>
             </div>
         </section>
 
-        <section class="section">
-            <div class="glass-card w-full reveal">
-                <h2 class="text-6xl font-black uppercase mb-10">Контакти</h2>
-                <div class="flex flex-wrap gap-20">
-                    <div>
-                        <p class="text-[10px] uppercase opacity-30 mb-2">Локація</p>
-                        <p class="text-xl">Київ, Україна</p>
-                    </div>
-                    <div>
-                        <p class="text-[10px] uppercase opacity-30 mb-2">Зв'язок</p>
-                        <p class="text-xl hover:text-accent transition-colors">etiketagp@gmail.com</p>
+        <section id="contacts" class="section flex flex-col px-6 py-32">
+            <div class="w-full max-w-6xl">
+                <h4 class="text-[10px] font-bold uppercase tracking-[0.5em] text-accent mb-12 text-center">Contact Syndicate</h4>
+                
+                <div class="flex justify-center mb-24">
+                    <a href="mailto:etiketagp@gmail.com" class="contact-link uppercase break-all text-center">
+                        etiketagp@gmail.com
+                    </a>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <a href="tel:0632686842" class="bento-card flex flex-col justify-between aspect-square lg:aspect-auto min-h-[300px]">
+                        <span class="text-[10px] uppercase tracking-widest opacity-30">Direct Call</span>
+                        <div class="text-4xl font-black tracking-tighter">063 268 68 42</div>
+                    </a>
+
+                    <div class="bento-card col-span-1 lg:col-span-2 flex flex-col justify-between min-h-[300px]">
+                        <span class="text-[10px] uppercase tracking-widest opacity-30">Secure Channels</span>
+                        <div class="flex flex-wrap gap-4 mt-10">
+                            <a href="#" class="px-8 py-5 bg-white/5 hover:bg-white hover:text-black rounded-2xl text-sm font-black uppercase transition-all duration-300">Telegram</a>
+                            <a href="#" class="px-8 py-5 bg-white/5 hover:bg-white hover:text-black rounded-2xl text-sm font-black uppercase transition-all duration-300">Viber</a>
+                            <a href="#" class="px-8 py-5 bg-white/5 hover:bg-white hover:text-black rounded-2xl text-sm font-black uppercase transition-all duration-300">Instagram</a>
+                        </div>
+                        <div class="mt-10 text-[10px] font-mono opacity-20 uppercase tracking-widest">Nodes: Kyiv / Warsaw / Global</div>
                     </div>
                 </div>
+
+                <footer class="mt-40 pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
+                    <div class="text-[9px] uppercase tracking-[0.4em] opacity-30">&copy; 2026 ETIKETKA GP. ALL RIGHTS RESERVED.</div>
+                    <div class="text-[9px] uppercase tracking-[0.4em] opacity-30">Designed for the future</div>
+                </footer>
             </div>
         </section>
     </main>
@@ -125,14 +151,14 @@
             vNormal = normal;
             vec3 pos = position;
             
-            // Деформація шейдером (не лагає!)
-            float noise = sin(pos.x * 2.0 + uTime) * cos(pos.y * 2.0 + uTime) * 0.2;
+            // Complex Organic Noise
+            float noise = sin(pos.x * 1.2 + uTime) * cos(pos.y * 1.2 + uTime * 0.8) * 0.4;
             pos += normal * noise;
             
-            // Магніт до миші
-            float dist = distance(uMouse, pos.xy * 0.2);
-            if(dist < 1.0) {
-                pos += normal * (1.0 - dist) * 0.5;
+            // Mouse Interaction Warp
+            float dist = distance(uMouse, pos.xy * 0.4);
+            if(dist < 1.5) {
+                pos += normal * (1.5 - dist) * 0.8;
             }
 
             vPosition = pos;
@@ -144,92 +170,128 @@
         varying vec3 vNormal;
         varying vec3 vPosition;
         uniform float uTime;
+        uniform vec3 uColor;
 
         void main() {
-            // Ефект Френеля (світіння країв)
             vec3 viewDirection = normalize(vec3(0, 0, 5) - vPosition);
-            float fresnel = pow(1.0 - dot(viewDirection, vNormal), 3.0);
+            float fresnel = pow(1.2 - dot(viewDirection, vNormal), 3.0);
             
-            vec3 color = mix(vec3(0.02), vec3(1.0, 0.2, 0.0), fresnel);
+            // Advanced Metallic/Liquid look
+            vec3 color = mix(vec3(0.005, 0.005, 0.01), uColor, fresnel);
             gl_FragColor = vec4(color, 1.0);
         }
     </script>
 
     <script>
-        // 1. Плавний скрол (Lenis)
-        const lenis = new Lenis();
-        function raf(time) {
-            lenis.raf(time);
-            requestAnimationFrame(raf);
-        }
+        // 1. Smooth Scroll (Lenis)
+        const lenis = new Lenis({ lerp: 0.05 });
+        function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
         requestAnimationFrame(raf);
 
         // 2. Three.js Engine
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ 
-            canvas: document.querySelector('#webgl'), 
-            antialias: true, 
-            alpha: true 
-        });
+        const renderer = new THREE.WebGLRenderer({ canvas: document.querySelector('#webgl'), antialias: true, alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-        // Geometry & Shader Material
-        const geometry = new THREE.IcosahedronGeometry(2, 64);
+        const uniforms = {
+            uTime: { value: 0 },
+            uMouse: { value: new THREE.Vector2(0, 0) },
+            uColor: { value: new THREE.Color("#FF3300") }
+        };
+
+        const geometry = new THREE.IcosahedronGeometry(2.2, 64);
         const material = new THREE.ShaderMaterial({
             vertexShader: document.getElementById('vertexShader').textContent,
             fragmentShader: document.getElementById('fragmentShader').textContent,
-            uniforms: {
-                uTime: { value: 0 },
-                uMouse: { value: new THREE.Vector2(0, 0) }
-            }
+            uniforms: uniforms
         });
 
         const mesh = new THREE.Mesh(geometry, material);
         scene.add(mesh);
         camera.position.z = 5;
 
-        // Mouse tracking
-        let mouse = new THREE.Vector2();
-        window.addEventListener('mousemove', (e) => {
-            mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-            mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+        // 3. Inverse Color Logic (The Core Task)
+        const text1 = document.getElementById('dynamic-text-1');
+        const text2 = document.getElementById('dynamic-text-2');
+        const sub = document.getElementById('dynamic-sub');
+
+        function updateContrast() {
+            const time = performance.now() * 0.001;
             
-            gsap.to(material.uniforms.uMouse.value, { x: mouse.x * 2, y: mouse.y * 2, duration: 0.5 });
+            // Cycle the blob color: Dark Red -> Bright White -> Orange -> Dark
+            // This is the "Lightness" driver
+            const cycle = Math.sin(time * 0.7) * 0.5 + 0.5; // 0 to 1
+            
+            const darkColor = new THREE.Color("#050505");
+            const lightColor = new THREE.Color("#ffffff");
+            const accentColor = new THREE.Color("#FF3300");
+
+            // Define the blob's current color
+            let currentBlobColor;
+            if (cycle < 0.5) {
+                currentBlobColor = darkColor.clone().lerp(accentColor, cycle * 2);
+            } else {
+                currentBlobColor = accentColor.clone().lerp(lightColor, (cycle - 0.5) * 2);
+            }
+            
+            uniforms.uColor.value.copy(currentBlobColor);
+
+            // Calculate luminance to decide text color
+            // Standard relative luminance formula
+            const luminance = (0.299 * currentBlobColor.r + 0.587 * currentBlobColor.g + 0.114 * currentBlobColor.b);
+            
+            // Inverse logic: if blob is bright (>0.5), text is black. If blob is dark, text is white.
+            const textLume = luminance > 0.5 ? 0.05 : 0.95;
+            const rgbValue = Math.floor(textLume * 255);
+            const finalTextColor = `rgb(${rgbValue}, ${rgbValue}, ${rgbValue})`;
+
+            text1.style.color = finalTextColor;
+            text2.style.color = finalTextColor;
+            sub.style.color = finalTextColor;
+        }
+
+        // Mouse Move
+        window.addEventListener('mousemove', (e) => {
+            const x = (e.clientX / window.innerWidth) * 2 - 1;
+            const y = -(e.clientY / window.innerHeight) * 2 + 1;
+            gsap.to(uniforms.uMouse.value, { x: x * 2, y: y * 2, duration: 0.8 });
             gsap.to('#cursor', { x: e.clientX, y: e.clientY, duration: 0.1 });
         });
 
-        // 3. Анімація
+        // 4. Animation Loop
         const clock = new THREE.Clock();
         function animate() {
             const elapsedTime = clock.getElapsedTime();
-            material.uniforms.uTime.value = elapsedTime;
+            uniforms.uTime.value = elapsedTime;
             
-            mesh.rotation.y = elapsedTime * 0.2;
+            updateContrast();
+
+            mesh.rotation.y = elapsedTime * 0.1;
             
-            // Паралакс при скролі
+            // Parallax Scroll
             const scrollY = window.scrollY;
-            mesh.position.y = -scrollY * 0.005;
-            mesh.rotation.z = scrollY * 0.001;
+            mesh.position.y = -scrollY * 0.003;
+            mesh.scale.set(1 + scrollY*0.0005, 1 + scrollY*0.0005, 1 + scrollY*0.0005);
 
             renderer.render(scene, camera);
             requestAnimationFrame(animate);
         }
         animate();
 
-        // 4. Reveal Animations (GSAP)
+        // 5. Scroll Reveals
         gsap.registerPlugin(ScrollTrigger);
         gsap.utils.toArray('.reveal').forEach(el => {
             gsap.from(el, {
                 scrollTrigger: {
                     trigger: el,
-                    start: "top 90%",
+                    start: "top 85%",
                     toggleActions: "play none none reverse"
                 },
-                y: 50,
+                y: 60,
                 opacity: 0,
-                duration: 1,
+                duration: 1.2,
                 ease: "power4.out"
             });
         });
