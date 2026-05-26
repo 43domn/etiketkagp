@@ -1,272 +1,364 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ETIKETKA GP | ULTRA PREMIUM</title>
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.19/bundled/lenis.min.js"></script>
-
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;900&display=swap" rel="stylesheet">
-    
+    <title>EtiketkaGP | Нереальная Полиграфия</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --accent: #FF3300; }
-        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; }
-        
-        body { background: #000; color: #fff; font-family: 'Space Grotesk', sans-serif; overflow-x: hidden; }
-
-        canvas#webgl { position: fixed; top: 0; left: 0; z-index: 1; pointer-events: none; }
-        
-        /* Блоби повернені і яскраві */
-        .cloud-container {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 2; pointer-events: none; filter: blur(120px);
-        }
-        .blob { position: absolute; border-radius: 50%; opacity: 0.5; will-change: transform; }
-        .blob-1 { width: 50vw; height: 50vw; background: var(--accent); top: -10%; left: -10%; }
-        .blob-2 { width: 40vw; height: 40vw; background: #fff; bottom: 10%; right: -10%; opacity: 0.2; }
-
-        .cursor {
-            position: fixed; width: 8px; height: 8px; background: #fff;
-            border-radius: 50%; pointer-events: none; z-index: 9999;
-            mix-blend-mode: difference; transition: transform 0.2s;
+        :root {
+            --cyan: #00FFFF;
+            --magenta: #FF00FF;
+            --yellow: #FFFF00;
+            --bg-color: #050508;
+            --text-color: #ffffff;
         }
 
-        /* Hero */
-        .hero-title {
-            font-size: clamp(4rem, 18vw, 15rem);
-            line-height: 0.8; font-weight: 900; text-transform: uppercase;
-            letter-spacing: -0.06em; text-align: center;
-            mix-blend-mode: difference;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Montserrat', sans-serif;
         }
 
-        /* Marquee */
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(0, 255, 255, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 85% 30%, rgba(255, 0, 255, 0.08) 0%, transparent 50%);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #000;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(var(--cyan), var(--magenta));
+            border-radius: 5px;
+        }
+
+        /* Header */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            background: rgba(5, 5, 8, 0.5);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            background: linear-gradient(45deg, var(--cyan), var(--magenta), var(--yellow));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: pulse-glow 2s infinite alternate;
+        }
+
+        @keyframes pulse-glow {
+            0% { text-shadow: 0 0 10px rgba(0, 255, 255, 0.2); }
+            100% { text-shadow: 0 0 20px rgba(255, 0, 255, 0.6); }
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 1000px;
+            position: relative;
+        }
+
+        .hero-content {
+            text-align: center;
+            z-index: 2;
+            transform-style: preserve-3d;
+        }
+
+        h1 {
+            font-size: 6rem;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            transform: translateZ(50px);
+        }
+
+        h1 span {
+            display: block;
+            background: linear-gradient(to right, #fff, rgba(255,255,255,0.5));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            color: #aaa;
+            margin-bottom: 40px;
+            transform: translateZ(30px);
+        }
+
+        /* 3D Interactive Card in Hero */
+        .tilt-card {
+            width: 400px;
+            height: 250px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transform-style: preserve-3d;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.1);
+            transition: transform 0.1s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tilt-card::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%; width: 200%; height: 200%;
+            background: conic-gradient(from 0deg, transparent 0%, var(--cyan) 25%, var(--magenta) 50%, var(--yellow) 75%, transparent 100%);
+            animation: rotate-gradient 4s linear infinite;
+            opacity: 0.3;
+            z-index: -1;
+        }
+
+        .tilt-card-inner {
+            background: #0a0a10;
+            width: 98%;
+            height: 97%;
+            border-radius: 18px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transform: translateZ(40px);
+        }
+
+        .tilt-card-inner h3 {
+            font-size: 2rem;
+            color: var(--cyan);
+            margin-bottom: 10px;
+        }
+
+        @keyframes rotate-gradient {
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Marquee Text */
+        .marquee-container {
+            width: 100%;
+            overflow: hidden;
+            background: var(--magenta);
+            color: #000;
+            padding: 15px 0;
+            transform: rotate(-2deg) scale(1.05);
+            margin: 50px 0;
+            box-shadow: 0 0 30px rgba(255, 0, 255, 0.4);
+        }
+
         .marquee {
-            overflow: hidden; white-space: nowrap; display: flex;
-            padding: 20px 0; border-top: 1px solid rgba(255,255,255,0.1); border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        .marquee-content { display: flex; animation: marquee 30s linear infinite; }
-        .marquee-content span { font-size: 8rem; font-weight: 900; text-transform: uppercase; padding: 0 4vw; opacity: 0.05; transition: 0.5s; }
-        .marquee-content span:hover { opacity: 1; color: var(--accent); }
-
-        @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-
-        /* Bento 2.0 */
-        .bento-card {
-            background: rgba(255, 255, 255, 0.02);
-            backdrop-filter: blur(40px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 40px; padding: 50px;
-            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-            position: relative; overflow: hidden;
-        }
-        .bento-card:hover { 
-            background: rgba(255, 255, 255, 0.05); 
-            border-color: var(--accent); 
-            transform: translateY(-10px) scale(1.01);
+            display: flex;
+            white-space: nowrap;
+            animation: scroll 15s linear infinite;
         }
 
-        .nav {
-            position: fixed; top: 0; width: 100%; padding: 2rem;
-            display: flex; justify-content: space-between; z-index: 100;
-            mix-blend-mode: difference;
+        .marquee h2 {
+            font-size: 2rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            padding: 0 20px;
         }
 
-        .text-reveal { opacity: 0; transform: translateY(30px); filter: blur(10px); }
+        @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* Services / Scroll Animations */
+        .services {
+            padding: 100px 50px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 3rem;
+            margin-bottom: 80px;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+        }
+
+        .service-card {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 40px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.05);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.5s ease;
+            /* Scroll Reveal Initial State */
+            opacity: 0;
+            transform: translateY(100px) rotateX(-20deg);
+        }
+
+        .service-card.show {
+            opacity: 1;
+            transform: translateY(0) rotateX(0deg);
+        }
+
+        .service-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0, 255, 255, 0.1);
+            border-color: var(--cyan);
+        }
+
+        .service-card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+
+        .service-card p {
+            color: #888;
+            line-height: 1.6;
+        }
+
+        .glowing-btn {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #000;
+            background: var(--yellow);
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            text-transform: uppercase;
+            text-decoration: none;
+            transition: 0.3s;
+            box-shadow: 0 0 20px rgba(255, 255, 0, 0.5);
+        }
+
+        .glowing-btn:hover {
+            box-shadow: 0 0 40px rgba(255, 255, 0, 0.8), 0 0 80px rgba(255, 255, 0, 0.4);
+            transform: scale(1.05);
+        }
     </style>
 </head>
 <body>
 
-    <div class="cursor" id="cursor"></div>
-    <canvas id="webgl"></canvas>
+    <header>
+        <div class="logo">EtiketkaGP</div>
+    </header>
 
-    <div class="cloud-container">
-        <div class="blob blob-1" id="blob1"></div>
-        <div class="blob blob-2" id="blob2"></div>
-    </div>
-
-    <nav class="nav">
-        <div class="font-black text-xl tracking-tighter">GP<span class="text-accent">.</span></div>
-        <div class="text-[10px] uppercase tracking-[0.4em] font-bold opacity-50">Kyiv Engineering</div>
-    </nav>
-
-    <main class="relative z-10">
-        <section class="h-screen flex items-center justify-center">
-            <div class="text-center">
-                <h1 class="hero-title reveal-hero">ETIKETKA</h1>
-                <h1 class="hero-title reveal-hero">GP<span class="text-accent">.</span></h1>
-            </div>
-        </section>
-
-        <div class="marquee mb-40">
-            <div class="marquee-content">
-                <span>Етикетки</span><span>Наклейки</span><span>Упаковка</span><span>Коробки</span><span>Флаєри</span><span>Буклети</span><span>Брошури</span>
-                <span>Етикетки</span><span>Наклейки</span><span>Упаковка</span><span>Коробки</span><span>Флаєри</span><span>Буклети</span><span>Брошури</span>
+    <section class="hero" id="hero">
+        <div class="hero-content">
+            <h1><span>ПЕЧАТЬ</span> БУДУЩЕГО</h1>
+            <p class="subtitle">Мы не просто наносим краску. Мы создаем визуальный экстаз.</p>
+            
+            <div class="tilt-card" id="tilt-card">
+                <div class="tilt-card-inner">
+                    <h3>PREMIUM</h3>
+                    <p style="color: #aaa;">Наведи курсор</p>
+                </div>
             </div>
         </div>
+    </section>
 
-        <section class="px-6 py-20 max-w-7xl mx-auto">
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
-                <div class="bento-card md:col-span-12">
-                    <span class="text-[10px] uppercase tracking-[0.6em] text-accent font-black block mb-10">/ Про нас</span>
-                    <h2 class="text-4xl md:text-7xl font-black uppercase leading-[0.9] mb-10 text-reveal">
-                        Ваш партнер для створення <br>функціональної упаковки.
-                    </h2>
-                    <p class="text-xl md:text-3xl text-white/40 max-w-4xl leading-relaxed text-reveal">
-                        Ми спеціалізуємося на друкуванні індивідуальних етикеток, картонної упаковки та поліграфії. Наша місія — забезпечити Вам преміальний результат у чітко визначені терміни.
-                    </p>
-                </div>
+    <div class="marquee-container">
+        <div class="marquee">
+            <h2>ЭТИКЕТКИ • УПАКОВКА • ШИРОКОФОРМАТ • 3D ЛАК • ТИСНЕНИЕ • ЭТИКЕТКИ • УПАКОВКА • ШИРОКОФОРМАТ • 3D ЛАК • ТИСНЕНИЕ •</h2>
+        </div>
+    </div>
 
-                <div class="bento-card md:col-span-4 flex flex-col justify-between group">
-                    <h3 class="text-sm uppercase tracking-widest opacity-30">Дизайн</h3>
-                    <div class="mt-20">
-                        <div class="text-6xl font-black mb-2 group-hover:text-accent transition-colors">FREE</div>
-                        <p class="text-white/40 uppercase text-xs tracking-widest">Адаптація макета</p>
-                    </div>
-                </div>
-
-                <div class="bento-card md:col-span-8 flex flex-col justify-between">
-                    <h3 class="text-sm uppercase tracking-widest opacity-30">Логістика</h3>
-                    <div class="flex flex-wrap gap-10 items-end mt-20">
-                        <div class="text-4xl font-black">НОВА ПОШТА</div>
-                        <div class="text-4xl font-black opacity-20">УКРПОШТА</div>
-                        <div class="text-4xl font-black opacity-20">MEEST</div>
-                    </div>
-                </div>
+    <section class="services">
+        <h2 class="section-title">Наши Услуги</h2>
+        <div class="cards-grid">
+            <div class="service-card">
+                <h3>Самоклеящиеся Этикетки</h3>
+                <p>Высокоточная флексопечать и цифровая печать. Яркие цвета, идеальная высечка, материалы премиум-класса.</p>
             </div>
-        </section>
-
-        <section class="px-6 py-40 max-w-7xl mx-auto">
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
-                
-                <div class="bento-card md:col-span-7 flex flex-col justify-between">
-                    <span class="text-[10px] uppercase tracking-[0.6em] text-accent font-black">Digital Hub</span>
-                    <a href="mailto:etiketkagp@gmail.com" class="text-3xl md:text-5xl font-black uppercase tracking-tighter mt-20 hover:text-accent transition-all break-all">
-                        etiketkagp@gmail.com
-                    </a>
-                </div>
-
-                <a href="https://instagram.com/etiketagp" class="bento-card md:col-span-5 flex flex-col justify-between group">
-                    <span class="text-[10px] uppercase tracking-[0.6em] opacity-30 font-black">Social Node</span>
-                    <div class="mt-20 text-4xl font-black group-hover:scale-105 transition-transform">INSTAGRAM ↗</div>
-                </a>
-
-                <div class="bento-card md:col-span-4">
-                    <span class="text-[10px] uppercase tracking-[0.6em] opacity-30 font-black mb-10 block">Primary Line</span>
-                    <a href="tel:0632686842" class="text-3xl font-black">063 268 68 42</a>
-                </div>
-
-                <div class="bento-card md:col-span-4 border-accent/20">
-                    <span class="text-[10px] uppercase tracking-[0.6em] text-accent font-black mb-10 block">Messenger Hub</span>
-                    <a href="tel:0986812021" class="text-3xl font-black">098 681 20 21</a>
-                    <div class="flex gap-4 mt-6 text-[10px] font-bold opacity-40">
-                        <span>TELEGRAM</span> / <span>VIBER</span>
-                    </div>
-                </div>
-
-                <div class="bento-card md:col-span-4">
-                    <span class="text-[10px] uppercase tracking-[0.6em] opacity-30 font-black mb-10 block">Base Location</span>
-                    <p class="text-2xl font-black leading-tight uppercase">Київ<br>вул. Промислова 1а</p>
-                </div>
+            <div class="service-card" style="transition-delay: 0.2s;">
+                <h3>Умная Упаковка</h3>
+                <p>Картонная упаковка любой сложности. Софт-тач покрытие, выборочный 3D-лак и фольгирование.</p>
             </div>
-
-            <footer class="mt-40 text-center opacity-20 text-[10px] uppercase tracking-[1em]">
-                Etiketka GP Syndicate © 2026
-            </footer>
-        </section>
-    </main>
-
-    <script id="vertexShader" type="x-shader/x-vertex">
-        varying vec3 vNormal;
-        varying vec3 vPosition;
-        uniform float uTime;
-        uniform vec2 uMouse;
-        void main() {
-            vNormal = normal;
-            vec3 pos = position;
-            float noise = sin(pos.x * 2.5 + uTime) * cos(pos.y * 2.5 + uTime) * 0.25;
-            pos += normal * noise;
-            float dist = distance(uMouse, pos.xy * 0.2);
-            if(dist < 1.3) { pos += normal * (1.3 - dist) * 0.7; }
-            vPosition = pos;
-            gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
-        }
-    </script>
-
-    <script id="fragmentShader" type="x-shader/x-fragment">
-        varying vec3 vNormal;
-        varying vec3 vPosition;
-        uniform float uTime;
-        void main() {
-            vec3 viewDirection = normalize(vec3(0, 0, 5) - vPosition);
-            float fresnel = pow(1.0 - dot(viewDirection, vNormal), 3.0);
-            vec3 color = mix(vec3(0.01), vec3(1.0, 0.2, 0.0), fresnel);
-            gl_FragColor = vec4(color, 1.0);
-        }
-    </script>
+            <div class="service-card" style="transition-delay: 0.4s;">
+                <h3>Широкоформат</h3>
+                <p>Баннеры, пленки, холсты. Идеальное качество для интерьерной и наружной рекламы.</p>
+            </div>
+        </div>
+        <div style="text-align: center; margin-top: 80px;">
+            <a href="#" class="glowing-btn">Заказать проект</a>
+        </div>
+    </section>
 
     <script>
-        // Smooth Scroll
-        const lenis = new Lenis({ lerp: 0.08 });
-        function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
-        requestAnimationFrame(raf);
+        // --- 1. 3D Tilt Effect для главного экрана ---
+        const tiltCard = document.getElementById('tilt-card');
+        const hero = document.getElementById('hero');
 
-        // Three.js
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ canvas: document.querySelector('#webgl'), antialias: true, alpha: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        
-        const geometry = new THREE.IcosahedronGeometry(2.3, 64);
-        const material = new THREE.ShaderMaterial({
-            vertexShader: document.getElementById('vertexShader').textContent,
-            fragmentShader: document.getElementById('fragmentShader').textContent,
-            uniforms: { uTime: { value: 0 }, uMouse: { value: new THREE.Vector2(0, 0) } }
-        });
-        const mesh = new THREE.Mesh(geometry, material);
-        scene.add(mesh);
-        camera.position.z = 5;
+        hero.addEventListener('mousemove', (e) => {
+            const rect = tiltCard.getBoundingClientRect();
+            const x = e.clientX - rect.left; // x position within the element.
+            const y = e.clientY - rect.top;  // y position within the element.
 
-        // Animations
-        window.addEventListener('mousemove', (e) => {
-            const mx = (e.clientX / window.innerWidth) * 2 - 1;
-            const my = -(e.clientY / window.innerHeight) * 2 + 1;
-            gsap.to(material.uniforms.uMouse.value, { x: mx * 2, y: my * 2, duration: 0.6 });
-            gsap.to('#cursor', { x: e.clientX, y: e.clientY, duration: 0.1 });
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+
+            // Вычисляем градус наклона
+            const rotateX = ((y - centerY) / centerY) * -20; // Макс 20 градусов
+            const rotateY = ((x - centerX) / centerX) * 20;
+
+            tiltCard.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.05, 1.05, 1.05)`;
         });
 
-        function moveBlob(id) {
-            gsap.to(id, { x: `random(-20, 20)vw`, y: `random(-20, 20)vh`, duration: `random(15, 25)`, ease: "sine.inOut", onComplete: () => moveBlob(id) });
-        }
-        moveBlob('#blob1'); moveBlob('#blob2');
-
-        // GSAP Scroll Animations
-        gsap.registerPlugin(ScrollTrigger);
-        
-        gsap.from(".reveal-hero", { y: 150, opacity: 0, duration: 1.5, stagger: 0.2, ease: "power4.out" });
-        
-        gsap.utils.toArray('.text-reveal').forEach(el => {
-            gsap.to(el, { scrollTrigger: { trigger: el, start: "top 85%" }, opacity: 1, y: 0, filter: "blur(0px)", duration: 1, ease: "power3.out" });
+        hero.addEventListener('mouseleave', () => {
+            tiltCard.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
         });
 
-        const clock = new THREE.Clock();
-        function animate() {
-            material.uniforms.uTime.value = clock.getElapsedTime();
-            mesh.rotation.y += 0.003;
-            mesh.position.y = -window.scrollY * 0.004;
-            renderer.render(scene, camera);
-            requestAnimationFrame(animate);
-        }
-        animate();
+        // --- 2. Scroll Reveal Animations (Анимации при скролле) ---
+        const observerOptions = {
+            threshold: 0.1, // Триггер, когда 10% элемента видно
+            rootMargin: "0px 0px -50px 0px"
+        };
 
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('show');
+                    // Можно отписать элемент после появления, чтобы анимация проигралась 1 раз
+                    // observer.unobserve(entry.target); 
+                }
+            });
+        }, observerOptions);
+
+        const serviceCards = document.querySelectorAll('.service-card');
+        serviceCards.forEach(card => {
+            observer.observe(card);
         });
     </script>
 </body>
