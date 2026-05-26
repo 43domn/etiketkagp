@@ -1,466 +1,228 @@
 <!DOCTYPE html>
-<html lang="uk" class="scroll-smooth">
+<html lang="uk">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ETIKETKA GP | МАЙБУТНЄ ДРУКУ</title>
+    <title>ETIKETKA GP | HYPER TACTILE</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        accent: '#FF3300', 
-                        dark: '#030303',
-                        surface: '#0A0A0A',
-                    },
-                    fontFamily: {
-                        display: ['Space Grotesk', 'sans-serif'],
-                        sans: ['Inter', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Space+Grotesk:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollToPlugin.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.19/bundled/lenis.min.js"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;700;900&display=swap" rel="stylesheet">
     
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; cursor: none !important; }
-        ::-webkit-scrollbar { display: none; }
-        
+        :root { --accent: #FF3300; }
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; }
         body { 
-            background-color: #030303; 
-            color: #F5F5F7; 
-            overflow-x: hidden;
-            -webkit-font-smoothing: antialiased;
+            background: #000; 
+            color: #fff; 
+            font-family: 'Space Grotesk', sans-serif;
+            overflow: hidden; /* Control scroll via Lenis/GSAP */
         }
-
-        .noise-bg {
-            position: fixed; inset: 0; z-index: 9998; pointer-events: none; opacity: 0.015;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3e%3cfilter id='noiseFilter'%3e%3cfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3e%3c/filter%3e%3crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3e%3c/svg%3e");
-        }
-
-        .cursor-dot { width: 4px; height: 4px; background: #FFF; position: fixed; border-radius: 50%; pointer-events: none; z-index: 100000; transition: opacity 0.3s; mix-blend-mode: difference; }
-        .cursor-ring { width: 36px; height: 36px; border: 1px solid rgba(255,255,255,0.2); position: fixed; border-radius: 50%; pointer-events: none; z-index: 99999; transform: translate(-50%, -50%); transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1), height 0.4s cubic-bezier(0.16, 1, 0.3, 1), background 0.4s, border-color 0.4s; will-change: transform; backdrop-filter: blur(2px); }
+        canvas { position: fixed; top: 0; left: 0; z-index: 1; pointer-events: none; }
         
-        .light-zone .cursor-ring { border-color: rgba(0,0,0,0.3); }
-        .hover-active .cursor-ring { width: 70px; height: 70px; background: rgba(255, 255, 255, 0.05); border-color: rgba(255, 255, 255, 1); backdrop-filter: blur(0px); mix-blend-mode: difference; }
-        .hover-active .cursor-dot { opacity: 0; }
+        /* Custom Cursor */
+        .cursor {
+            position: fixed; width: 20px; height: 20px; background: var(--accent);
+            border-radius: 50%; pointer-events: none; z-index: 9999;
+            mix-blend-mode: difference; transition: transform 0.15s ease-out;
+        }
 
-        #webgl-canvas { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
+        .section {
+            height: 100vh; width: 100%; position: relative;
+            display: flex; align-items: center; justify-content: center;
+            padding: 0 10%; z-index: 2;
+        }
 
-        .text-outline { -webkit-text-stroke: 1px rgba(255,255,255,0.3); color: transparent; transition: all 0.5s ease; }
-        .group:hover .text-outline { -webkit-text-stroke: 1px #FFF; color: rgba(255,255,255,0.05); }
+        .hero-text { font-size: 15vw; line-height: 0.8; font-weight: 900; letter-spacing: -0.05em; }
+        .outline-text { -webkit-text-stroke: 1px rgba(255,255,255,0.2); color: transparent; }
         
-        .bento-card {
-            background: linear-gradient(145deg, rgba(28,28,30,0.9) 0%, rgba(10,10,12,0.95) 100%);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.06);
-            border-radius: 24px;
-            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.5s, box-shadow 0.5s;
-            position: relative;
-            overflow: hidden;
+        .bento-grid {
+            display: grid; grid-template-columns: repeat(12, 1fr); gap: 20px; width: 100%;
         }
-        .bento-card:hover { 
-            border-color: rgba(255,255,255,0.2); 
-            transform: translateY(-8px) scale(1.005); 
-            box-shadow: 0 30px 60px rgba(0,0,0,0.15);
+        .bento-item {
+            background: rgba(255,255,255,0.03); backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 30px;
+            padding: 40px; transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
         }
+        .bento-item:hover { background: rgba(255,255,255,0.08); border-color: var(--accent); transform: scale(1.02); }
 
-        .btn-magnetic {
-            position: relative; display: inline-flex; align-items: center; justify-content: center;
-            padding: 18px 40px; border-radius: 100px; border: 1px solid rgba(255,255,255,0.1);
-            background: rgba(255,255,255,0.02); overflow: hidden; transition: all 0.4s ease;
+        .nav-fixed {
+            position: fixed; top: 40px; left: 40px; right: 40px;
+            display: flex; justify-content: space-between; z-index: 100;
         }
-        .btn-magnetic::before {
-            content: ''; position: absolute; top: 100%; left: 0; width: 100%; height: 100%;
-            background: #FFF; border-radius: 50% 50% 0 0; transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1); z-index: -1;
-        }
-        .btn-magnetic:hover::before { top: 0; border-radius: 0; }
-        .btn-magnetic:hover { border-color: #FFF; color: #000; font-weight: 700; transform: scale(1.05); }
-
-        .btn-hero { background: #FFF; color: #000; border-color: #FFF; }
-        .btn-hero::before { background: #000; }
-        .btn-hero:hover { color: #FFF; border-color: #333; }
-
-        .fade-up { opacity: 0; transform: translateY(50px); will-change: opacity, transform; transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1); }
-        .fade-up.is-inview { opacity: 1; transform: translateY(0); }
-        
-        .marquee-container { display: flex; width: 200%; animation: marquee 30s linear infinite; }
-        @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
     </style>
 </head>
-<body class="font-sans">
+<body>
 
-    <div class="noise-bg"></div>
+    <div class="cursor" id="cursor"></div>
+    <canvas id="canvas3d"></canvas>
 
-    <div class="cursor-dot" id="cdot"></div>
-    <div class="cursor-ring" id="coutline"></div>
-
-    <canvas id="webgl-canvas"></canvas>
-
-    <nav class="fixed top-0 w-full z-[90] p-6 md:p-10 flex justify-between items-center mix-blend-difference pointer-events-none">
-        <div class="hover-target pointer-events-auto cursor-pointer" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
-            <div class="font-display font-black text-2xl tracking-tighter text-white group">
-                GP<span class="text-accent group-hover:pl-2 transition-all">.</span>
-            </div>
-        </div>
-        <div class="hidden md:flex gap-10 text-[10px] uppercase font-display font-bold tracking-[0.2em] text-white pointer-events-auto">
-            <a href="#about" class="hover-target transition-colors hover:text-accent">Про нас</a>
-            <a href="#showcase" class="hover-target transition-colors hover:text-accent">Кейси</a>
-            <a href="#contacts" class="hover-target transition-colors hover:text-accent">Контакти</a>
+    <nav class="nav-fixed mix-blend-difference">
+        <div class="text-2xl font-black">GP<span class="text-[var(--accent)]">.</span></div>
+        <div class="flex gap-8 text-[10px] uppercase tracking-widest font-bold">
+            <button onclick="gsap.to(window, {scrollTo: '#sec1'})">Home</button>
+            <button onclick="gsap.to(window, {scrollTo: '#sec2'})">Manifesto</button>
+            <button onclick="gsap.to(window, {scrollTo: '#sec3'})">Cases</button>
         </div>
     </nav>
 
-    <main>
-        
-        <section id="top" class="min-h-screen flex flex-col justify-center px-6 md:px-10 relative overflow-hidden">
-            
-            <div class="absolute top-[25%] left-0 w-full overflow-hidden opacity-[0.03] pointer-events-none -rotate-2 select-none">
-                <div class="marquee-container">
-                    <span class="font-display font-black text-[25vw] uppercase tracking-tighter leading-none whitespace-nowrap">ETIKETKA GP ETIKETKA GP ETIKETKA GP </span>
-                    <span class="font-display font-black text-[25vw] uppercase tracking-tighter leading-none whitespace-nowrap">ETIKETKA GP ETIKETKA GP ETIKETKA GP </span>
+    <main id="main">
+        <section id="sec1" class="section">
+            <div class="text-center">
+                <div class="overflow-hidden">
+                    <h1 class="hero-text transform-up">ETIKETKA</h1>
                 </div>
+                <div class="overflow-hidden">
+                    <h1 class="hero-text outline-text transform-up">SYNTHESIS</h1>
+                </div>
+                <p class="mt-8 text-white/40 tracking-[0.5em] uppercase text-xs">Architects of tactile reality / Kyiv 2026</p>
             </div>
+        </section>
 
-            <div class="z-10 mt-20 w-full max-w-[1600px] mx-auto relative">
-                
-                <div class="flex justify-between items-end mb-12 fade-up">
-                    <div class="flex flex-col gap-4">
-                        <span class="inline-block border border-white/20 px-4 py-2 rounded-full text-white/60 font-display font-bold uppercase tracking-[0.4em] text-[9px] md:text-[10px] w-max backdrop-blur-md">
-                            Синдикат тактильної інженерії
-                        </span>
-                        <p class="text-white/40 font-mono text-[10px] tracking-widest hidden md:block">ШИР: 50.4501° N / ДОВ: 30.5234° E</p>
-                    </div>
-                    
-                    <div class="w-24 h-24 md:w-32 md:h-32 hidden md:flex items-center justify-center animate-[spin_12s_linear_infinite] opacity-50 hover:opacity-100 transition-opacity">
-                        <svg viewBox="0 0 100 100" class="w-full h-full fill-white">
-                            <path id="circlePath" d="M 50, 50 m -37, 0 a 37,37 0 1,1 74,0 a 37,37 0 1,1 -74,0" fill="none"/>
-                            <text font-size="10" font-family="Space Grotesk" font-weight="bold" letter-spacing="3.5">
-                                <textPath href="#circlePath">АБСОЛЮТНА ТОЧНІСТЬ • ВИЩИЙ КЛАС •</textPath>
-                            </text>
-                        </svg>
-                        <div class="absolute w-2 h-2 bg-accent rounded-full"></div>
-                    </div>
+        <section id="sec2" class="section">
+            <div class="bento-grid">
+                <div class="bento-item col-span-12 md:col-span-7">
+                    <span class="text-accent text-xs font-bold tracking-widest uppercase">/ 01 Engineering</span>
+                    <h2 class="text-5xl font-bold mt-4 mb-6">Майбутнє, яке можна торкнутися.</h2>
+                    <p class="text-white/50 leading-relaxed max-w-md">Ми не просто друкуємо — ми створюємо фізичні інтерфейси для ваших продуктів. Кожен мікрон лаку має значення.</p>
                 </div>
-                
-                <div class="relative group cursor-none hover-target w-full fade-up">
-                    <h1 class="font-display font-black leading-[0.75] tracking-tighter uppercase relative z-10 w-full flex flex-col">
-                        <span class="block text-[16vw] md:text-[13vw] text-transparent bg-clip-text bg-gradient-to-b from-white to-white/60 transition-transform duration-700 ease-out group-hover:translate-x-8">МАЙБУТНЄ</span>
-                        <span class="block text-[15vw] md:text-[13vw] text-outline self-end md:mr-10 transition-transform duration-700 ease-out group-hover:-translate-x-8">ДРУКУ<span class="text-accent text-[10vw]">.</span></span>
-                    </h1>
-                </div>
-                
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-end w-full border-t border-white/10 pt-10 mt-16 fade-up">
-                    <p class="max-w-md text-sm md:text-base text-white/50 font-light leading-relaxed mb-8 md:mb-0">
-                        Ми не просто друкуємо. Ми будуємо архітектуру для брендів. Переосмислюємо візуальне сприйняття через глибокий тактильний екстаз.
-                    </p>
-                    <div>
-                        <a href="#showcase" class="btn-magnetic btn-hero hover-target text-xs uppercase tracking-[0.2em] font-display font-bold">Почати досвід</a>
+                <div class="bento-item col-span-12 md:col-span-5 flex items-center justify-center border-accent/20">
+                    <div class="text-center">
+                        <div class="text-6xl font-black mb-2">99.9%</div>
+                        <div class="text-[10px] uppercase tracking-widest text-white/40">Точність кольору</div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section id="about" class="py-32 md:py-40 px-6 md:px-20 relative z-20 bg-white text-dark rounded-t-[40px] md:rounded-t-[60px]">
-            <div class="max-w-7xl mx-auto w-full">
-                
-                <div class="flex flex-col md:flex-row justify-between items-end mb-20 fade-up">
-                    <h2 class="font-display font-black text-5xl md:text-8xl tracking-tighter leading-none uppercase text-dark">
-                        Маніфест<br><span class="text-dark/15">бренду.</span>
-                    </h2>
-                    <p class="max-w-sm text-dark/60 text-sm mt-8 md:mt-0 leading-relaxed font-medium">Ваш стратегічний партнер у створенні високотехнологічних етикеток та структурних пакувальних рішень.</p>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[auto]">
-                    
-                    <div class="bento-card p-10 md:col-span-2 group hover-target fade-up text-white">
-                        <div class="text-[10px] font-display font-bold tracking-[0.3em] text-accent mb-10">/ 01 ІНЖИНІРИНГ</div>
-                        <h4 class="text-3xl md:text-4xl font-display font-bold mb-6 text-white group-hover:text-accent transition-colors">Дизайн та адаптація</h4>
-                        <p class="text-white/60 text-sm leading-relaxed max-w-md mb-8">Симбіоз креативу та інженерної точності. Ми безкоштовно адаптуємо макети під вимоги обладнання та створюємо преміальні дизайни з нуля.</p>
-                        <ul class="space-y-3 text-sm text-white/80">
-                            <li class="flex items-center gap-3"><span class="w-1.5 h-1.5 rounded-full bg-accent"></span> Кольоропроба перед друком</li>
-                            <li class="flex items-center gap-3"><span class="w-1.5 h-1.5 rounded-full bg-accent"></span> Індивідуальні рішення від 50$</li>
-                        </ul>
+        <section id="sec3" class="section">
+            <div class="w-full">
+                <h2 class="text-8xl font-black outline-text mb-12">PROJECTS</h2>
+                <div class="flex gap-10 overflow-x-hidden">
+                    <div class="min-w-[400px] h-[500px] bento-item bg-cover bg-center relative group" style="background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80')">
+                         <div class="absolute inset-0 bg-black/60 group-hover:bg-accent/40 transition-all duration-500 rounded-[30px]"></div>
+                         <div class="relative z-10 p-4">
+                             <h3 class="text-2xl font-bold">VODKA PREM</h3>
+                             <p class="text-xs opacity-60">Embossing / Foil / Tactile</p>
+                         </div>
                     </div>
-
-                    <div class="bento-card p-10 group hover-target flex flex-col justify-between fade-up text-white">
-                        <div>
-                            <div class="text-[10px] font-display font-bold tracking-[0.3em] text-white/30 mb-10">/ 02 СПЕКТР</div>
-                            <h4 class="text-2xl font-display font-bold mb-4 text-white">Вектор продукції</h4>
-                            <p class="text-white/60 text-sm leading-relaxed mb-6">Від самоклеючих етикеток преміум-класу до складної геометричної картонної упаковки.</p>
-                        </div>
+                    <div class="min-w-[400px] h-[500px] bento-item bg-cover bg-center relative group" style="background-image: url('https://images.unsplash.com/photo-1594035910387-fea47794261f?q=80')">
+                         <div class="absolute inset-0 bg-black/60 group-hover:bg-accent/40 transition-all duration-500 rounded-[30px]"></div>
+                         <div class="relative z-10 p-4">
+                             <h3 class="text-2xl font-bold">PARFUM NOIR</h3>
+                             <p class="text-xs opacity-60">Soft Touch / UV Varnish</p>
+                         </div>
                     </div>
-
-                    <div class="bento-card p-10 group hover-target fade-up text-white">
-                        <div class="text-[10px] font-display font-bold tracking-[0.3em] text-white/30 mb-10">/ 03 ЯКІСТЬ</div>
-                        <h4 class="text-2xl font-display font-bold mb-4 text-white">Абсолютна точність</h4>
-                        <p class="text-white/60 text-sm leading-relaxed">Безкомпромісний контроль кожного мікрона. Суворо обмежені терміни виконання замовлень.</p>
-                    </div>
-
-                    <div class="bento-card p-10 md:col-span-2 group hover-target bg-[url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop')] bg-cover bg-center fade-up text-white">
-                        <div class="absolute inset-0 bg-black/85 group-hover:bg-black/70 transition-colors duration-500"></div>
-                        <div class="relative z-10">
-                            <div class="text-[10px] font-display font-bold tracking-[0.3em] text-accent mb-10">/ 04 ЛОГІСТИКА</div>
-                            <h4 class="text-3xl md:text-4xl font-display font-bold mb-4 text-white">Синхронна доставка</h4>
-                            <p class="text-white/70 text-sm leading-relaxed max-w-sm">Миттєва логістика по всьому світу. Ваш тираж завжди вчасно, без затримок.</p>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </section>
-
-        <section id="showcase" class="py-32 bg-dark">
-            <div class="max-w-6xl mx-auto px-6">
-                <div class="mb-32">
-                    <h2 class="text-6xl md:text-8xl font-display font-black uppercase text-white/10 tracking-tighter leading-none">
-                        Кейси.<br><span class="text-white">Відчуття.</span>
-                    </h2>
-                </div>
-                
-                <div class="flex flex-col gap-20">
-                    <div class="case-item bento-card rounded-[40px] p-2 h-[70vh] flex flex-col md:flex-row text-white">
-                        <div class="w-full md:w-1/2 h-1/2 md:h-full rounded-[32px] overflow-hidden relative">
-                            <img src="https://images.unsplash.com/photo-1594035910387-fea47794261f?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover" alt="Perfume">
-                        </div>
-                        <div class="w-full md:w-1/2 p-8 md:p-16 flex flex-col justify-center">
-                            <div class="text-accent text-5xl font-display font-black mb-6">01</div>
-                            <h4 class="text-2xl md:text-4xl font-display font-bold mb-4">Нішева парфумерія</h4>
-                            <p class="text-white/50 text-sm leading-relaxed">Soft-touch покриття, об'ємний УФ-лак та складна картонна архітектура. Тактильний гіпноз.</p>
-                        </div>
-                    </div>
-
-                    <div class="case-item bento-card rounded-[40px] p-2 h-[70vh] flex flex-col md:flex-row text-white">
-                        <div class="w-full md:w-1/2 h-1/2 md:h-full rounded-[32px] overflow-hidden relative">
-                            <img src="https://images.unsplash.com/photo-1584916201218-f4242ceb4809?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover" alt="Wine">
-                        </div>
-                        <div class="w-full md:w-1/2 p-8 md:p-16 flex flex-col justify-center">
-                            <div class="text-accent text-5xl font-display font-black mb-6">02</div>
-                            <h4 class="text-2xl md:text-4xl font-display font-bold mb-4">Колекційне вино</h4>
-                            <p class="text-white/50 text-sm leading-relaxed">Багатошаровий текстурований папір, глибоке сліпе тиснення та золота фольга. Історія бренду.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="contacts" class="min-h-screen flex flex-col items-center justify-center text-center px-6 relative z-10 pt-32 pb-10 bg-dark">
-            
-            <div class="w-full max-w-5xl fade-up">
-                <h4 class="text-[10px] font-display uppercase tracking-[0.5em] text-accent font-bold mb-8">Встановити зв'язок</h4>
-                <a href="mailto:etiketagp@gmail.com" class="text-[8vw] md:text-[6vw] font-display font-black uppercase leading-[0.9] text-outline block hover-target mb-20 break-all">
-                    etiketagp@gmail.com
-                </a>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
-                    <a href="tel:0632686842" class="bento-card p-10 flex flex-col justify-between min-h-[200px] hover-target group text-white">
-                        <div class="text-[10px] font-display uppercase tracking-[0.2em] text-white/30 group-hover:text-accent transition-colors">Пряма лінія</div>
-                        <div class="text-4xl md:text-5xl font-display font-black text-white mt-auto tracking-tighter">063 268 68 42</div>
-                    </a>
-
-                    <div class="bento-card p-10 flex flex-col justify-between min-h-[200px] text-white">
-                        <div class="text-[10px] font-display uppercase tracking-[0.2em] text-white/30">Безпечний зв'язок</div>
-                        <div class="flex gap-4 mt-6 mb-4">
-                            <a href="#" class="flex-1 py-4 text-center text-xs font-display font-bold uppercase bg-white/5 hover:bg-white hover:text-black rounded-xl transition-all hover-target">Telegram</a>
-                            <a href="#" class="flex-1 py-4 text-center text-xs font-display font-bold uppercase bg-white/5 hover:bg-white hover:text-black rounded-xl transition-all hover-target">Viber</a>
-                        </div>
-                        <div class="text-[10px] font-mono text-white/30">Вузол: 098 681 20 21</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="w-full mt-32 border-t border-white/10 py-10 flex flex-col md:flex-row justify-between items-center gap-6 fade-up">
-                <p class="text-[10px] font-display uppercase tracking-[0.3em] text-white/30">&copy; 2026 ETIKETKA GP. ВСІ ПРАВА ЗАХИЩЕНО.</p>
-                <div class="flex gap-10 text-[10px] font-display uppercase tracking-[0.2em] font-bold text-white/50">
-                    <a href="#" class="hover-target hover:text-white transition-colors">Instagram</a>
-                    <a href="#" class="hover-target hover:text-white transition-colors">Локація</a>
                 </div>
             </div>
         </section>
     </main>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.19/bundled/lenis.min.js"></script>
-
     <script>
-        gsap.registerPlugin(ScrollTrigger);
-
-        const lenis = new Lenis({
-            duration: 1.2,
-            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-            smooth: true
-        });
-
-        function raf(time) {
-            lenis.raf(time);
-            requestAnimationFrame(raf);
-        }
+        // 1. SCROLL SETUP (LENIS + GSAP)
+        const lenis = new Lenis({ duration: 1.5, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
+        function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
         requestAnimationFrame(raf);
 
-        lenis.on('scroll', ScrollTrigger.update);
-        gsap.ticker.add((time)=>{ lenis.raf(time * 1000); });
-        gsap.ticker.lagSmoothing(0, 0);
-
-        const cdot = document.getElementById('cdot');
-        const coutline = document.getElementById('coutline');
-        let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
-        let outlineX = mouseX, outlineY = mouseY;
-
-        window.addEventListener('mousemove', (e) => {
-            mouseX = e.clientX; mouseY = e.clientY;
-            gsap.to(cdot, { x: mouseX - 2, y: mouseY - 2, duration: 0.01 });
+        // Section Snapping
+        gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+        const sections = gsap.utils.toArray(".section");
+        sections.forEach((section, i) => {
+            ScrollTrigger.create({
+                trigger: section,
+                start: "top center",
+                onEnter: () => gsap.to(window, {scrollTo: {y: section, autoKill: false}, duration: 1, ease: "power4.inOut"}),
+            });
         });
 
-        function updateOutline() {
-            outlineX += (mouseX - outlineX) * 0.15;
-            outlineY += (mouseY - outlineY) * 0.15;
-            coutline.style.transform = `translate(${outlineX}px, ${outlineY}px) translate(-50%, -50%)`;
-            requestAnimationFrame(updateOutline);
-        }
-        updateOutline();
-
-        document.querySelectorAll('.hover-target, a, button').forEach(item => {
-            item.addEventListener('mouseenter', () => document.body.classList.add('hover-active'));
-            item.addEventListener('mouseleave', () => document.body.classList.remove('hover-active'));
-        });
-
-        ScrollTrigger.create({
-            trigger: "#about",
-            start: "top 50%",
-            end: "bottom 50%",
-            onEnter: () => document.body.classList.add("light-zone"),
-            onLeave: () => document.body.classList.remove("light-zone"),
-            onEnterBack: () => document.body.classList.add("light-zone"),
-            onLeaveBack: () => document.body.classList.remove("light-zone")
-        });
-
+        // 2. THREE.JS: MORPHING LIQUID OBJECT
         const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('webgl-canvas'), alpha: true, antialias: true });
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('canvas3d'), alpha: true, antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-        const particleCount = 1500;
-        const geometry = new THREE.BufferGeometry();
-        const positions = new Float32Array(particleCount * 3);
-
-        for (let i = 0; i < particleCount * 3; i += 3) {
-            positions[i] = (Math.random() - 0.5) * 60;
-            positions[i + 1] = (Math.random() - 0.5) * 60;
-            positions[i + 2] = (Math.random() - 0.5) * 40;
-        }
-
-        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-
-        // ВАЖЛИВО: Тут виправлений рядок transformed.z += ...
-        const vertexShader = `
-            uniform float uTime; uniform float uScrollSpeed; uniform vec2 uMouse;
-            varying vec3 vColor;
-            void main() {
-                vec3 transformed = position;
-                transformed.y += sin(uTime * 0.1 + position.x) * 0.2;
-                transformed.x += cos(uTime * 0.05 + position.y) * 0.15;
-                transformed.z += uScrollSpeed * 0.1;
-                if (transformed.z > 20.0) transformed.z = -20.0;
-                float distToMouse = distance(transformed.xy, uMouse * 25.0);
-                if(distToMouse < 6.0) {
-                    transformed.z += (6.0 - distToMouse) * 0.3;
-                }
-                vec4 mvPosition = modelViewMatrix * vec4(transformed, 1.0);
-                gl_Position = projectionMatrix * mvPosition;
-                gl_PointSize = (2.5 * (300.0 / -mvPosition.z));
-                vColor = mix(vec3(0.08, 0.08, 0.09), vec3(0.25, 0.25, 0.25), smoothstep(2.0, 15.0, length(transformed.xy)));
-            }
-        `;
-
-        const fragmentShader = `
-            varying vec3 vColor;
-            void main() {
-                float dist = length(gl_PointCoord - vec2(0.5));
-                if (dist > 0.5) discard;
-                float alpha = smoothstep(0.5, 0.1, dist) * 0.4;
-                gl_FragColor = vec4(vColor, alpha);
-            }
-        `;
-
-        const material = new THREE.ShaderMaterial({
-            vertexShader,
-            fragmentShader,
-            uniforms: {
-                uTime: { value: 0 },
-                uScrollSpeed: { value: 0 },
-                uMouse: { value: new THREE.Vector2(0, 0) }
-            },
-            transparent: true,
-            depthWrite: false,
-            blending: THREE.AdditiveBlending
+        
+        // Geometry
+        const geometry = new THREE.IcosahedronGeometry(2, 64);
+        const material = new THREE.MeshNormalMaterial({ wireframe: false, flatShading: false });
+        
+        // Custom Shader for "Liquid" effect
+        const customMaterial = new THREE.MeshStandardMaterial({
+            color: 0x111111,
+            metalness: 1,
+            roughness: 0.05,
+            emissive: 0xFF3300,
+            emissiveIntensity: 0.1
         });
 
-        const particleSystem = new THREE.Points(geometry, material);
-        scene.add(particleSystem);
-        camera.position.z = 30;
+        const mesh = new THREE.Mesh(geometry, customMaterial);
+        scene.add(mesh);
 
+        // Lights
+        const light1 = new THREE.DirectionalLight(0xFF3300, 2);
+        light1.position.set(5, 5, 5);
+        scene.add(light1);
+        const light2 = new THREE.PointLight(0x0066FF, 2);
+        light2.position.set(-5, -5, 2);
+        scene.add(light2);
+        scene.add(new THREE.AmbientLight(0x404040));
+
+        camera.position.z = 6;
+
+        // Animation Loop
         const clock = new THREE.Clock();
-        let currentScrollSpeed = 0;
-
-        lenis.on('scroll', (e) => { currentScrollSpeed = e.velocity; });
-
-        function animate3D() {
-            requestAnimationFrame(animate3D);
+        function animate() {
             const time = clock.getElapsedTime();
-            material.uniforms.uTime.value = time;
-            material.uniforms.uScrollSpeed.value += (currentScrollSpeed - material.uniforms.uScrollSpeed.value) * 0.05;
-            currentScrollSpeed *= 0.95; 
-            const targetMX = (mouseX / window.innerWidth - 0.5) * 2;
-            const targetMY = (mouseY / window.innerHeight - 0.5) * -2;
-            material.uniforms.uMouse.value.x += (targetMX - material.uniforms.uMouse.value.x) * 0.05;
-            material.uniforms.uMouse.value.y += (targetMY - material.uniforms.uMouse.value.y) * 0.05;
-            particleSystem.rotation.y = time * 0.008;
-            particleSystem.rotation.x = time * 0.003;
+            
+            // Distort Geometry
+            const positions = mesh.geometry.attributes.position;
+            const vertex = new THREE.Vector3();
+            for (let i = 0; i < positions.count; i++) {
+                vertex.fromBufferAttribute(positions, i);
+                const noise = Math.sin(vertex.x * 2 + time) * Math.cos(vertex.y * 2 + time) * 0.2;
+                vertex.multiplyScalar(1 + noise * 0.01);
+                positions.setXYZ(i, vertex.x, vertex.y, vertex.z);
+            }
+            positions.needsUpdate = true;
+
+            mesh.rotation.y += 0.005;
+            mesh.rotation.x += 0.003;
+
+            // Parallax based on scroll
+            const scroll = window.scrollY / 1000;
+            mesh.position.y = Math.sin(scroll) * 0.5;
+            mesh.scale.set(1 + scroll*0.2, 1 + scroll*0.2, 1 + scroll*0.2);
+
             renderer.render(scene, camera);
+            requestAnimationFrame(animate);
         }
-        animate3D();
+        animate();
+
+        // 3. CURSOR & INTERACTIVITY
+        const cursor = document.getElementById('cursor');
+        window.addEventListener('mousemove', (e) => {
+            gsap.to(cursor, { x: e.clientX, y: e.clientY, duration: 0.3 });
+            
+            // Interactive 3D move
+            const x = (e.clientX / window.innerWidth - 0.5) * 2;
+            const y = (e.clientY / window.innerHeight - 0.5) * -2;
+            gsap.to(mesh.position, { x: x * 2, y: y * 2, duration: 1 });
+        });
+
+        // 4. GSAP ENTRANCE ANIMATIONS
+        gsap.from(".transform-up", {
+            y: 200, skewY: 10, duration: 1.5, stagger: 0.2, ease: "power4.out"
+        });
 
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
-
-        gsap.utils.toArray('.fade-up').forEach(element => {
-            gsap.to(element, {
-                opacity: 1,
-                y: 0,
-                duration: 1.2,
-                ease: "power4.out",
-                scrollTrigger: {
-                    trigger: element,
-                    start: "top 88%",
-                    toggleActions: "play none none reverse"
-                }
-            });
-        });
-
-        gsap.utils.toArray('.case-item').forEach((item) => {
-            gsap.fromTo(item, 
-                { y: 100, x: 50, opacity: 0, rotation: 2 }, 
-                { y: 0, x: 0, opacity: 1, rotation: 0, duration: 1.5, ease: "power4.out",
-                    scrollTrigger: {
-                        trigger: item,
-                        start: "top 85%", 
-                        toggleActions: "play none none reverse"
-                    }
-                }
-            );
-        });
-
-        window.addEventListener('resize', () => { ScrollTrigger.refresh(); });
-        window.addEventListener("load", () => { setTimeout(() => { ScrollTrigger.refresh(); }, 200); });
     </script>
 </body>
 </html>
