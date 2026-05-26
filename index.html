@@ -2,363 +2,79 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EtiketkaGP | Нереальная Полиграфия</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
+    <title>Etiketka GP | Interactive</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
     <style>
-        :root {
-            --cyan: #00FFFF;
-            --magenta: #FF00FF;
-            --yellow: #FFFF00;
-            --bg-color: #050508;
-            --text-color: #ffffff;
+        body, html { margin: 0; padding: 0; overflow: hidden; background: #050505; color: #fff; font-family: 'Inter', sans-serif; }
+        canvas { display: block; }
+        
+        #ui-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; flex-direction: column; justify-content: space-between; padding: 40px;
+            pointer-events: none; box-sizing: border-box;
         }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Montserrat', sans-serif;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            overflow-x: hidden;
-            background-image: 
-                radial-gradient(circle at 15% 50%, rgba(0, 255, 255, 0.08) 0%, transparent 50%),
-                radial-gradient(circle at 85% 30%, rgba(255, 0, 255, 0.08) 0%, transparent 50%);
-        }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 10px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #000;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: linear-gradient(var(--cyan), var(--magenta));
-            border-radius: 5px;
-        }
-
-        /* Header */
-        header {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            padding: 20px 50px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 100;
-            background: rgba(5, 5, 8, 0.5);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .logo {
-            font-size: 28px;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            background: linear-gradient(45deg, var(--cyan), var(--magenta), var(--yellow));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: pulse-glow 2s infinite alternate;
-        }
-
-        @keyframes pulse-glow {
-            0% { text-shadow: 0 0 10px rgba(0, 255, 255, 0.2); }
-            100% { text-shadow: 0 0 20px rgba(255, 0, 255, 0.6); }
-        }
-
-        /* Hero Section */
-        .hero {
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            perspective: 1000px;
-            position: relative;
-        }
-
-        .hero-content {
-            text-align: center;
-            z-index: 2;
-            transform-style: preserve-3d;
-        }
-
-        h1 {
-            font-size: 6rem;
-            font-weight: 900;
-            line-height: 1.1;
-            margin-bottom: 20px;
-            transform: translateZ(50px);
-        }
-
-        h1 span {
-            display: block;
-            background: linear-gradient(to right, #fff, rgba(255,255,255,0.5));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .subtitle {
-            font-size: 1.5rem;
-            color: #aaa;
-            margin-bottom: 40px;
-            transform: translateZ(30px);
-        }
-
-        /* 3D Interactive Card in Hero */
-        .tilt-card {
-            width: 400px;
-            height: 250px;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(15px);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transform-style: preserve-3d;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.1);
-            transition: transform 0.1s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .tilt-card::before {
-            content: '';
-            position: absolute;
-            top: -50%; left: -50%; width: 200%; height: 200%;
-            background: conic-gradient(from 0deg, transparent 0%, var(--cyan) 25%, var(--magenta) 50%, var(--yellow) 75%, transparent 100%);
-            animation: rotate-gradient 4s linear infinite;
-            opacity: 0.3;
-            z-index: -1;
-        }
-
-        .tilt-card-inner {
-            background: #0a0a10;
-            width: 98%;
-            height: 97%;
-            border-radius: 18px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            transform: translateZ(40px);
-        }
-
-        .tilt-card-inner h3 {
-            font-size: 2rem;
-            color: var(--cyan);
-            margin-bottom: 10px;
-        }
-
-        @keyframes rotate-gradient {
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Marquee Text */
-        .marquee-container {
-            width: 100%;
-            overflow: hidden;
-            background: var(--magenta);
-            color: #000;
-            padding: 15px 0;
-            transform: rotate(-2deg) scale(1.05);
-            margin: 50px 0;
-            box-shadow: 0 0 30px rgba(255, 0, 255, 0.4);
-        }
-
-        .marquee {
-            display: flex;
-            white-space: nowrap;
-            animation: scroll 15s linear infinite;
-        }
-
-        .marquee h2 {
-            font-size: 2rem;
-            font-weight: 900;
-            text-transform: uppercase;
-            padding: 0 20px;
-        }
-
-        @keyframes scroll {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-        }
-
-        /* Services / Scroll Animations */
-        .services {
-            padding: 100px 50px;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .section-title {
-            text-align: center;
-            font-size: 3rem;
-            margin-bottom: 80px;
-        }
-
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 40px;
-        }
-
-        .service-card {
-            background: rgba(255, 255, 255, 0.03);
-            padding: 40px;
-            border-radius: 20px;
-            border: 1px solid rgba(255,255,255,0.05);
-            position: relative;
-            overflow: hidden;
-            transition: all 0.5s ease;
-            /* Scroll Reveal Initial State */
-            opacity: 0;
-            transform: translateY(100px) rotateX(-20deg);
-        }
-
-        .service-card.show {
-            opacity: 1;
-            transform: translateY(0) rotateX(0deg);
-        }
-
-        .service-card:hover {
-            transform: translateY(-10px) scale(1.02);
-            box-shadow: 0 20px 40px rgba(0, 255, 255, 0.1);
-            border-color: var(--cyan);
-        }
-
-        .service-card h3 {
-            font-size: 1.8rem;
-            margin-bottom: 20px;
-            color: #fff;
-        }
-
-        .service-card p {
-            color: #888;
-            line-height: 1.6;
-        }
-
-        .glowing-btn {
-            display: inline-block;
-            margin-top: 30px;
-            padding: 15px 40px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #000;
-            background: var(--yellow);
-            border: none;
-            border-radius: 30px;
-            cursor: pointer;
-            text-transform: uppercase;
-            text-decoration: none;
-            transition: 0.3s;
-            box-shadow: 0 0 20px rgba(255, 255, 0, 0.5);
-        }
-
-        .glowing-btn:hover {
-            box-shadow: 0 0 40px rgba(255, 255, 0, 0.8), 0 0 80px rgba(255, 255, 0, 0.4);
-            transform: scale(1.05);
-        }
+        .header { display: flex; justify-content: space-between; }
+        h1 { font-size: 8vw; margin: 0; letter-spacing: -0.05em; pointer-events: auto; }
+        .footer { font-size: 12px; opacity: 0.6; }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="logo">EtiketkaGP</div>
-    </header>
-
-    <section class="hero" id="hero">
-        <div class="hero-content">
-            <h1><span>ПЕЧАТЬ</span> БУДУЩЕГО</h1>
-            <p class="subtitle">Мы не просто наносим краску. Мы создаем визуальный экстаз.</p>
-            
-            <div class="tilt-card" id="tilt-card">
-                <div class="tilt-card-inner">
-                    <h3>PREMIUM</h3>
-                    <p style="color: #aaa;">Наведи курсор</p>
-                </div>
-            </div>
+    <div id="ui-layer">
+        <div class="header">
+            <div>ETIKETKA GP</div>
+            <div>MENU //////</div>
         </div>
-    </section>
-
-    <div class="marquee-container">
-        <div class="marquee">
-            <h2>ЭТИКЕТКИ • УПАКОВКА • ШИРОКОФОРМАТ • 3D ЛАК • ТИСНЕНИЕ • ЭТИКЕТКИ • УПАКОВКА • ШИРОКОФОРМАТ • 3D ЛАК • ТИСНЕНИЕ •</h2>
+        <div>
+            <h1>PRECISION<br>IN PRINT</h1>
         </div>
+        <div class="footer">SCROLL TO INTERACT // 2026</div>
     </div>
 
-    <section class="services">
-        <h2 class="section-title">Наши Услуги</h2>
-        <div class="cards-grid">
-            <div class="service-card">
-                <h3>Самоклеящиеся Этикетки</h3>
-                <p>Высокоточная флексопечать и цифровая печать. Яркие цвета, идеальная высечка, материалы премиум-класса.</p>
-            </div>
-            <div class="service-card" style="transition-delay: 0.2s;">
-                <h3>Умная Упаковка</h3>
-                <p>Картонная упаковка любой сложности. Софт-тач покрытие, выборочный 3D-лак и фольгирование.</p>
-            </div>
-            <div class="service-card" style="transition-delay: 0.4s;">
-                <h3>Широкоформат</h3>
-                <p>Баннеры, пленки, холсты. Идеальное качество для интерьерной и наружной рекламы.</p>
-            </div>
-        </div>
-        <div style="text-align: center; margin-top: 80px;">
-            <a href="#" class="glowing-btn">Заказать проект</a>
-        </div>
-    </section>
-
     <script>
-        // --- 1. 3D Tilt Effect для главного экрана ---
-        const tiltCard = document.getElementById('tilt-card');
-        const hero = document.getElementById('hero');
+        // Инициализация сцены
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
 
-        hero.addEventListener('mousemove', (e) => {
-            const rect = tiltCard.getBoundingClientRect();
-            const x = e.clientX - rect.left; // x position within the element.
-            const y = e.clientY - rect.top;  // y position within the element.
+        // Создание частиц (эффект Active Theory)
+        const geometry = new THREE.BufferGeometry();
+        const count = 2000;
+        const positions = new Float32Array(count * 3);
+        for(let i=0; i<count*3; i++) positions[i] = (Math.random() - 0.5) * 10;
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        
+        const material = new THREE.PointsMaterial({ size: 0.02, color: 0xffffff });
+        const points = new THREE.Points(geometry, material);
+        scene.add(points);
 
-            const centerX = rect.width / 2;
-            const centerY = rect.height / 2;
+        camera.position.z = 5;
 
-            // Вычисляем градус наклона
-            const rotateX = ((y - centerY) / centerY) * -20; // Макс 20 градусов
-            const rotateY = ((x - centerX) / centerX) * 20;
-
-            tiltCard.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.05, 1.05, 1.05)`;
+        // Интерактивность с мышью
+        let mouseX = 0, mouseY = 0;
+        document.addEventListener('mousemove', (e) => {
+            mouseX = (e.clientX / window.innerWidth) - 0.5;
+            mouseY = (e.clientY / window.innerHeight) - 0.5;
         });
 
-        hero.addEventListener('mouseleave', () => {
-            tiltCard.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
-        });
+        // Анимация
+        function animate() {
+            requestAnimationFrame(animate);
+            points.rotation.y += 0.001;
+            points.rotation.x += mouseY * 0.05;
+            points.rotation.y += mouseX * 0.05;
+            renderer.render(scene, camera);
+        }
+        animate();
 
-        // --- 2. Scroll Reveal Animations (Анимации при скролле) ---
-        const observerOptions = {
-            threshold: 0.1, // Триггер, когда 10% элемента видно
-            rootMargin: "0px 0px -50px 0px"
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('show');
-                    // Можно отписать элемент после появления, чтобы анимация проигралась 1 раз
-                    // observer.unobserve(entry.target); 
-                }
-            });
-        }, observerOptions);
-
-        const serviceCards = document.querySelectorAll('.service-card');
-        serviceCards.forEach(card => {
-            observer.observe(card);
+        // Ресайз
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
         });
     </script>
 </body>
